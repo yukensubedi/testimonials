@@ -1,0 +1,227 @@
+{% load static %}
+{% load  django_bootstrap5  %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{% static 'img/favicon.png' %}" rel="icon">
+    <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/quill/quill.snow.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/simple-datatables/style.css' %}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    {% block extra_head %}
+    {% endblock %}
+</head>
+
+<body>
+
+   
+  
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="#" class="logo d-flex align-items-center">
+                <img src="{% static 'img/logo.png' %}" alt="">
+                <span class="fw-bold fs-4 text-primary d-none d-lg-block">Testimonials</span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div>
+
+        <div class="search-bar">
+            <form class="search-form d-flex align-items-center" method="POST" action="#">
+                <input type="text" name="query" placeholder="Search" title="Enter search keyword">
+                <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+                <li class="nav-item dropdown pe-3">
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                        <img 
+                        src="{% if user.profile_image and user.profile_image.url %}{{ user.profile_image.url }}{% else %}{% static 'img/profile-img.png' %}{% endif %}" 
+                        alt="Profile" 
+                        class="rounded-circle">
+                      <span class="d-none d-md-block dropdown-toggle ps-2">{{ user.first_name }}</span>
+                      
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li class="dropdown-header">
+                            <h6>{{user.get_full_name}}</h6>
+                            <span>{{user.email}}</span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        
+                        <li>
+                           
+                            
+                            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <div class="d-flex justify-content-center  my-2">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center">
+                                        <i class="bi bi-box-arrow-right"></i>  Logout
+                                    </button>
+                                </div>
+                            </form>
+                           
+                        </li>
+                        
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-item">
+                <a class="nav-link " href="{% url 'dashboard' %}">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+                  <i class="bi bi-journal-text"></i><span>Spaces</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                  <li>
+                    <a href="{% url 'spaces_list' %}">
+                      <i class="bi bi-circle"></i><span>Spaces List</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'create_spaces' %}">
+                      <i class="bi bi-circle"></i><span>Create Spaces</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'wall_of_love_list' %}">
+                      <i class="bi  bi-circle"></i><span>Wall of Love</span>
+                    </a>
+                  </li>
+                  
+                  <li>
+                    <a href="forms-validation.html">
+                      <i class="bi bi-circle"></i><span>Form Validation</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              
+        </ul>
+    </aside>
+
+
+    <main id="main" class="main">
+
+    {% if messages %}
+  {% for message in messages %}
+ 
+  <div class="alert  
+              {% if message.tags == 'success' %}
+                  alert-success
+              {% elif message.tags == 'warning' %}
+                  alert-danger 
+              {% elif message.tags == 'error' %}
+              alert-info 
+              {% else %}
+                  alert-primary 
+              {% endif %}
+  alert-dismissible fade show" role="alert" 
+  style="position: fixed; top: 20px; right: 20px; width: 400px; z-index: 9999;">
+  
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+
+     
+
+ 
+        <div class="pagetitle">
+            <h1>{% block pagetitle %}{% endblock %}</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    
+                   {% block breadcrumb %}{% endblock %}
+                </ol>
+            </nav>
+        </div>
+
+        <section class="section dashboard">
+            <div class="row">
+                {% block content %}
+                <!-- Page content goes here -->
+                {% endblock %}
+            </div>
+        </section>
+    </main>
+
+    <br>
+
+    <!-- ======= Footer ======= -->
+    <footer class="container mt-5 fixed-bottom bg-light shadow-sm">
+        <p class="text-center text-muted">© 2023 Testimonial. All rights reserved.</p>
+    </footer>
+    
+    <!-- <footer id="footer" class="footer fixed-bottom">
+        <div class="copyright">
+            &copy; Copyright <strong><span>Testimonials</span></strong>. All Rights Reserved
+        </div>
+    </footer> -->
+
+    <script>
+        window.setTimeout(function() {
+          let alerts = document.querySelectorAll('.alert');
+          alerts.forEach(alert => {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+          });
+        }, 3000);  // 3000 milliseconds = 3 seconds
+      </script>
+      
+    <!-- Vendor JS Files -->
+    <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'vendor/chart.js/chart.umd.js' %}"></script>
+    <script src="{% static 'vendor/echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'vendor/quill/quill.js' %}"></script>
+    <script src="{% static 'vendor/simple-datatables/simple-datatables.js' %}"></script>
+    <script src="{% static 'vendor/tinymce/tinymce.min.js' %}"></script>
+    <script src="{% static 'vendor/php-email-form/validate.js' %}"></script>
+
+    <!-- Template Main JS File -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_scripts %}
+    {% endblock %}
+</body>
+
+</html>

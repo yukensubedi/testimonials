@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Wall of Love{% endblock %}
+
+{% block pagetitle %}Wall of Love{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="#">Home</a></li>
+    <li class="breadcrumb-item active">Wall of Love</li>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-12">
+    <div class="card top-selling overflow-auto">
+
+      <div class="card-body pb-0">
+        <h5 class="card-title">Wall of Love </h5>
+
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th scope="col">Preview</th>
+              <th scope="col">Spaces</th>
+              <th scope="col">Testimonials in Wall of love</th>
+              <th scope="col">Sold</th>
+              <th scope="col">Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for space in spaces %}
+            <tr>
+              <th scope="row"><a href="#"><img src="{{ space.spaces_logo.url }}" alt=""></a></th>
+              <td><a href="#" class="text-primary fw-bold">{{ space.spaces_name }}</a></td>
+              <td>{{ space.testimonial_count }}</td>
+              <td class="fw-bold">124</td>
+              <td>$5,828</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">Wall of Love Empty.</td>
+            </tr>
+            {% endfor %}
+
+            
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Test{% endblock %}
+
+{% block pagetitle %}Ukn{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="#">Home</a></li>
+    <li class="breadcrumb-item active">Test</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mt-4">Update Space</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+{% endblock %}

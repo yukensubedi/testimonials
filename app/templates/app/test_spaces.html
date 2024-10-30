@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Test{% endblock %}
+
+{% block pagetitle %}Ukn{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="#">Home</a></li>
+    <li class="breadcrumb-item active">Test</li>
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <h3>Questions</h3>
+    
+    <div id="question-formset">
+        {{ formset.management_form }}
+        {% for form in formset %}
+            <div class="form-row question-form">
+                {{ form.as_p }}
+                <button type="button" class="remove-question">Remove</button>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <button type="button" id="add-question">Add Question</button>
+    
+    <br><br>
+    <button type="submit">Save</button>
+</form>
+
+<!-- Preview Section -->
+<h3>Preview</h3>
+<div id="preview-section">
+    <h4>Space Title:</h4>
+    <p id="preview-title"></p>
+    
+    <h4>Questions:</h4>
+    <ul id="preview-questions">
+        <!-- Questions preview will be updated here -->
+    </ul>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- JavaScript to handle dynamic addition/removal of questions and updating preview -->
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    let formsetDiv = document.getElementById('question-formset');
+    let totalFormsInput = document.getElementById('id_questions-TOTAL_FORMS');
+    let formIndex = formsetDiv.querySelectorAll('.question-form').length;
+    
+    let previewTitle = document.getElementById('preview-title');
+    let previewQuestions = document.getElementById('preview-questions');
+    
+    // Function to add a new question form
+    function addQuestionForm() {
+        let newForm = formsetDiv.querySelector('.question-form').cloneNode(true);
+        let formRegex = new RegExp(`questions-(\\d+)-`, 'g');
+        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formIndex}-`);
+        
+        let inputs = newForm.querySelectorAll('input');
+        inputs.forEach(input => input.value = '');
+
+        formsetDiv.appendChild(newForm);
+        formIndex++;
+        totalFormsInput.value = formIndex;
+    }
+
+    // Add event listener to "Add Question" button
+    document.getElementById('add-question').addEventListener('click', addQuestionForm);
+
+    // Function to remove a question form
+    formsetDiv.addEventListener('click', function(event) {
+        if (event.target && event.target.matches('button.remove-question')) {
+            event.target.closest('.question-form').remove();
+            formIndex--;
+            totalFormsInput.value = formIndex;
+        }
+    });
+
+    // Function to update the preview
+    function updatePreview() {
+        // Update the title preview
+        let titleInput = document.querySelector('input[name="title"]');
+        if (titleInput) {
+            previewTitle.textContent = titleInput.value;
+        }
+
+        // Clear previous questions in the preview
+        previewQuestions.innerHTML = '';
+
+        // Update the questions preview
+        let questionInputs = formsetDiv.querySelectorAll('input[name^="questions-"][name$="-question_text"]');
+        questionInputs.forEach(input => {
+            let li = document.createElement('li');
+            li.textContent = input.value;
+            previewQuestions.appendChild(li);
+        });
+    }
+
+    // Add event listeners to update preview in real time
+    document.addEventListener('input', updatePreview);
+});
+
+</script>
+{% endblock %}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Cards Layout</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            margin-bottom: 20px; /* Space between cards */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Card 1 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Short Content</h5>
+                    <p class="card-text">This is a short description.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 2 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Short Content</h5>
+                    <p class="card-text">Another brief description.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 (Long Content) -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Long Content</h5>
+                    <p class="card-text">This card contains a longer description that might span multiple lines. It adjusts based on the content length to fill the available space efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Additional cards with varying content lengths -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Short Content</h5>
+                    <p class="card-text">Brief description here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Very Long Content</h5>
+                    <p class="card-text">This card contains a much longer description, which serves as an example of dynamic content adjustment. Depending on the viewport size and content length, the card layout will adapt accordingly to maintain an elegant UI without leaving any gaps between the cards.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Medium Content</h5>
+                    <p class="card-text">Somewhat longer description that still keeps it concise.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<iframe src="http://localhost:8000/embed/wall-of-love/frontend-page-for-ukn/" width="100%" style="border: none; overflow: hidden;" scrolling="no"></iframe>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Testimonials</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif; /* Fallback font */
+        }
+        .testimonial-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 16px;
+        }
+        .testimonial-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            transition: transform 0.2s; /* Adding transition for hover effect */
+        }
+        .testimonial-card:hover {
+            transform: scale(1.02); /* Slightly scale up on hover */
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            color: white;
+            background-color: #6f42c1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .star-rating {
+            color: #ffc107;
+        }
+        .card-text.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .toggle-text {
+            cursor: pointer;
+            color: #6f42c1;
+            font-weight: 500;
+        }
+        .btn-close-custom {
+            background-color: transparent;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn-close-custom:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            transform: scale(1.1);
+        }
+        .btn-close-custom:focus {
+            outline: none;
+        }
+        .container {
+            max-width: none;
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="testimonial-container">
+            {% for entry in wall_of_love_testimonials %}
+            <div class="testimonial-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar me-3">{{ entry.testimonial.sender_name|slice:":2"|upper }}</div>
+                    <div>
+                        <h5 class="card-title mb-0">{{ entry.testimonial.sender_name }}</h5>
+                        <div class="star-rating mt-1">
+                            {% for star in "★★★★★" %}
+                                {% if forloop.counter <= entry.testimonial.star_rating %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <p class="card-text {% if entry.testimonial.testimonial_text|length > 100 %}collapsed{% endif %}">
+                    {{ entry.testimonial.testimonial_text|truncatechars:100 }}
+                </p>
+                {% if entry.testimonial.testimonial_text|length > 100 %}
+                    <a href="#" class="toggle-text" data-bs-toggle="modal" data-bs-target="#testimonialModal" data-sender="{{ entry.testimonial.sender_name }}" data-stars="{{ entry.testimonial.star_rating }}" data-text="{{ entry.testimonial.testimonial_text }}">Read more</a>
+                {% endif %}
+                <p class="card-text mt-2"><small class="text-muted">{{ entry.testimonial.created_at }}</small></p>
+            </div>
+            {% empty %}
+            <p>No testimonials available for this space.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="logo-container d-flex justify-content-center">
+        <img src="http://localhost:8000/static/img/logo.png" alt="Logo" class="img-fluid" style="height: 25px;">
+        <span class="text-primary fw-bold"> &nbsp; Testimonials</span>
+    </div>
+
+    <div class="modal fade" id="testimonialModal" tabindex="-1" aria-labelledby="testimonialModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0">
+                <div class="modal-body p-4 position-relative">
+                    <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar me-3" id="modalAvatar">AB</div>
+                        <div>
+                            <h5 class="card-title mb-0" id="modalSender">Sender Name</h5>
+                            <div class="star-rating mt-1" id="modalStarRating"></div>
+                        </div>
+                    </div>
+                    <p class="card-text" id="modalText">Full testimonial text will be displayed here.</p>
+                    <p class="card-text mt-2">
+                        <small class="text-muted" id="modalDate">{{ entry.testimonial.created_at }}</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const testimonialModal = document.getElementById('testimonialModal');
+            const modalAvatar = document.getElementById('modalAvatar');
+            const modalSender = document.getElementById('modalSender');
+            const modalStarRating = document.getElementById('modalStarRating');
+            const modalText = document.getElementById('modalText');
+
+            testimonialModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const sender = button.getAttribute('data-sender');
+                const stars = button.getAttribute('data-stars');
+                const text = button.getAttribute('data-text');
+
+                modalAvatar.textContent = sender.slice(0, 2).toUpperCase();
+                modalSender.textContent = sender;
+                modalText.textContent = text;
+
+                modalStarRating.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    const starClass = i < stars ? 'bi bi-star-fill' : 'bi bi-star';
+                    modalStarRating.innerHTML += `<i class="${starClass}"></i>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

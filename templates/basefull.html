@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Testimonials | {% block title %}  {% endblock %}</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{% static 'img/favicon.png' %}" rel="icon">
+    <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/quill/quill.snow.css' %}" rel="stylesheet">
+   
+   
+   
+
+    <!-- Template Main CSS File -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    {% block extra_head %}
+    {% endblock %}
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm py-3">
+        <div class="container">
+            <!-- Logo and Testimonials text -->
+            <a href="#" class="navbar-brand d-flex align-items-center">
+                <img src="{% static 'img/logo.png' %}" alt="" class="me-2" style="width: 40px;">
+                <!-- Hide the text on smaller screens -->
+                <span class="fw-bold fs-4 text-primary d-none d-lg-block">Testimonials</span>
+            </a>
+    
+            <!-- Toggler button for smaller screens -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <!-- Collapsible Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="customersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Customers
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Customer 1</a></li>
+                            <li><a class="dropdown-item" href="#">Customer 2</a></li>
+                            <li><a class="dropdown-item" href="#">Customer 3</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#">Integrations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#">Pricing</a>
+                    </li>
+                </ul>
+    
+                <!-- Right-aligned Sign In button -->
+                <div class="d-flex ms-auto">
+                    {% if user.is_authenticated %}
+                     <!-- Vertically centered Modal -->
+                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+                       Logout
+                    </button>
+                    <div class="modal fade" id="verticalycentered" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title">Are you sure you want to logout?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Logout</button>
+                            </form>
+                            </div>
+                        </div>
+                        </div>
+                    </div><!-- End Vertically centered Modal-->
+                    {% else %}
+                        <a href="{% url 'sign_in' %}" class="w-100">
+                            <button type="button" class="btn btn-outline-primary w-100"><i class="bi bi-google me-1"></i> Sign In</button>
+                        </a>
+                    {% endif %}
+                </div>
+                {% if messages %}
+                {% for message in messages %}
+               
+                <div class="alert  
+                            {% if message.tags == 'success' %}
+                                alert-success
+                            {% elif message.tags == 'warning' %}
+                                alert-danger 
+                            {% elif message.tags == 'error' %}
+                            alert-info 
+                            {% else %}
+                                alert-primary 
+                            {% endif %}
+                alert-dismissible fade show" role="alert" 
+                style="position: fixed; top: 20px; right: 20px; width: 400px; z-index: 9999;">
+                
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+              {% endif %}
+              
+                
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+                <!-- Page content goes here -->
+    {% endblock %}
+    
+    <!-- <main class="container mt-5 py-5">
+        <div class="row justify-content-center text-center pt-5">
+            <div class="col-md-8">
+                <h1 class="display-4 fw-bold mb-4">Get testimonials from your customers with ease</h1>
+                <p class="lead mb-5">Collecting testimonials is hard, we get it! So we built Testimonial. In minutes, you can collect text and video testimonials from your customers with no need for a developer or website hosting.</p>
+                <div class="d-flex justify-content-center mb-3">
+                    <a href="#" class="btn btn-primary btn-lg me-3">Try FREE now</a>
+                    <a href="#" class="btn btn-outline-primary btn-lg">Talk to us 👋</a>
+                </div>
+                <p class="text-muted">Get started with free credits on us. <a href="#" class="text-primary">See our pricing →</a></p>
+            </div>
+        </div>
+    </main> -->
+    
+    <footer class="container mt-5 fixed-bottom bg-light shadow-sm">
+        <p class="text-center text-muted">© 2023 Testimonial. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        window.setTimeout(function() {
+          let alerts = document.querySelectorAll('.alert');
+          alerts.forEach(alert => {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+          });
+        }, 3000);  // 3000 milliseconds = 3 seconds
+      </script>
+    <!-- Vendor JS Files -->
+   
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+   
+    <script src="{% static 'vendor/quill/quill.js' %}"></script>
+    <script src="{% static 'vendor/tinymce/tinymce.min.js' %}"></script>
+
+    <!-- Template Main JS File -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_scripts %}
+    {% endblock %}
+</body>
+
+</html>

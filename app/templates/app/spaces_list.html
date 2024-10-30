@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}Spaces{% endblock %}
+
+{% block pagetitle %}Spaces{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="#">Home</a></li>
+    <li class="breadcrumb-item active">Spaces</li>
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <div id="copy-notification" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background-color:#333; color:#fff; padding:10px 20px; border-radius:5px; z-index:1050;">
+                Link copied!
+            </div>
+            <h5 class="card-title">Spaces</h5>
+            <form method="get" class="row g-3 mb-4">
+                <!-- Search by name -->
+                <div class="col-md-3">
+                    <input type="text" name="spaces_name" class="form-control" placeholder="Search by name" value="{{ request.GET.spaces_name }}">
+                </div>
+                
+                <!-- Star rating filter -->
+                <div class="col-md-3">
+                    <select name="star_rating" class="form-select">
+                        <option value="" disabled selected>Star Ratings</option>
+                        <option value="True" {% if request.GET.star_rating == 'True' %}selected{% endif %}>Yes</option>
+                        <option value="False" {% if request.GET.star_rating == 'False' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+
+                <!-- Created at date range filter with placeholders -->
+                  <!-- Created at date range filter with placeholders -->
+                  <div class="col-md-3">
+                    <input type="text" name="created_at_after" class="form-control" placeholder="From Date" onfocus="this.type='date'" value="{{ request.GET.created_at_after }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="created_at_before" class="form-control" placeholder="To Date" onfocus="this.type='date'" value="{{ request.GET.created_at_before }}">
+                </div>
+
+                <!-- Apply Filters Button -->
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-primary">Apply Filters</button>
+                    
+                    <a href="{% url 'spaces_list' %}"><button type="button" class="btn btn-outline-danger">Reset</button></a>
+
+                </div>
+            </form>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Spaces</th>
+                            <th>Testimonials</th>
+                            <th>Date Created</th>
+                            <th>Star Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for space in spaces %}
+                            
+                            <tr>
+                                <td>{{ space.spaces_name }}
+                                    
+                                    
+                                </td>
+                                <td>{{ space.testimonial_count }}</td>
+                                <td>{{ space.created_at }}</td>
+                                <td>
+                                    <span class="badge {% if space.star_rating %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ space.star_rating }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a alt="view" href="{% url 'spaces_detail' space.slug %}" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="View" title="View Space">
+                               
+                                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye-fill"></i></button>
+                                    </a>
+                                      <a onclick="copyLink('{{space.generated_link }}', event)"  alt="Copy Link" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Copy Link" title="Copy Link">
+                                           
+                                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-clipboard-check-fill"></i></button>
+                                    </a>
+                                        <a alt="Edit" href="{% url 'spaces_update' space.pk %}" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user" title="Edit">
+                                           
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                                        </a>
+
+                                        
+                                        <button class="btn btn-sm btn-outline-secondary " title="Delete" data-bs-toggle="modal" data-bs-target="#verticalycentered"><i class="bi bi-trash"></i></button>
+                                       
+                                         <!-- Vertically centered Modal -->
+                                        <div class="modal fade" id="verticalycentered" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <!-- <div class="modal-header">
+                                                <h5 class="modal-title">Delete this ?</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div> -->
+                                                <div class="modal-body">
+                                                    Are you sure you want to delete the space <a href="" class="text-danger">{{space.spaces_name}}</a>? <br>
+                                                    <small>All the testimonials datas will also be deleted. </small>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-danger">Delete</button>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                   
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No spaces created.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+           
+            <!-- Pagination -->
+
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" tabindex="-1" aria-disabled="true">&laquo; Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for page_num in paginator.page_range %}
+                        <li class="page-item {% if page_num == page_obj.number %}active{% endif %}">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" tabindex="-1" aria-disabled="true">Next &raquo;</a>
+                        </li>
+                    {% endif %}
+                   
+                </ul>
+            </nav>
+            <span class="d-block">
+                <small>
+                    <i>
+                Page {{ page_obj.number }} of {{ paginator.num_pages }}
+            </i>
+            </small>
+            </span>
+           
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    
+    .card {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    }
+    .table {
+        color: #495057;
+    }
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+    }
+    .badge {
+        font-weight: 500;
+    }
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #ced4da;
+    }
+    .btn-outline-secondary:hover {
+        color: #495057;
+        background-color: #e9ecef;
+        border-color: #ced4da;
+    }
+</style>
+
+
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function copyLink(linkText, event) {
+        // Prevent page refresh
+        event.preventDefault();
+  
+        navigator.clipboard.writeText(linkText).then(() => {
+            const notification = document.getElementById("copy-notification");
+            notification.style.display = "block";
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 1500);
+        }).catch((error) => {
+            console.error("Could not copy text: ", error);
+        });
+    }
+  </script>
+{% endblock %}

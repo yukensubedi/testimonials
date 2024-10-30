@@ -1,0 +1,159 @@
+{% extends 'base_detail.html' %}
+{% load static %}
+
+{% block title %}{{object.spaces_name}}{% endblock %}
+
+
+{% block content %}
+<div class="card-body">
+    <div class="text-center mb-4"> 
+        <!-- Logo and preview section -->
+        <img  src="{% if object.spaces_logo and object.spaces_logo.url %}{{ object.spaces_logo.url }}{% else %}{% static 'img/logo.png' %}{% endif %}" alt="Profile" class="mb-3" style="width: 200px; height: 200px; object-fit: cover;">
+      
+        <h2 class="h4" >{{object.header_title}}</h2>
+        <p class="text-muted">{{object.message}}</p>
+    </div>
+
+    <!-- Left-aligned Questions section -->
+    <div class="">
+        <h3 class="h5 mb-3">Questions</h3>
+        <hr class="mt-0 mb-3" style="width: 80px; border: 2px solid #007bff;">
+        <ul  class="list-unstyled ms-4">
+            {% for question in questions %}
+            <li class="mb-2">• {{question.question_text}}</li>
+            {% empty %}
+            <li class="mb-2">No Questions available for this Space</li>
+            {% endfor %}
+            
+        </ul>
+    </div>
+
+   
+
+    <!-- Buttons Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-center mt-4 gap-3">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+            <i class="bi bi-pencil"></i> Send in text
+          </button>
+    </div>
+
+       <!-- Vertically centered Modal -->
+      <div class="modal fade" id="verticalycentered" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title"><strong>Write Text Testimonial to {{object.spaces_name}} </strong></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+            <div class="modal-body "> 
+                <img src="{% if object.spaces_logo and object.spaces_logo.url %}{{ object.spaces_logo.url }}{% else %}{% static 'img/logo.png' %}{% endif %}" 
+                     alt="Profile" 
+                     class="mb-3 mx-auto d-block" 
+                     style="width: 100px; height: 100px; object-fit: cover;">
+                <h3 class="h6 mb-3">Questions</h3> 
+                <hr class="mt-0 mb-3" style="width: 80px; border: 2px solid #007bff;">
+                
+                <ul class="list-unstyled ms-4">
+                    {% for question in questions %}
+                    <li class="mb-2" style="font-size: 0.9rem;">• {{ question.question_text }}</li>  
+                    {% empty %}
+                    <li class="mb-2" style="font-size: 0.9rem;">No Questions available for this Space</li> 
+                    {% endfor %}
+                </ul>
+
+               
+                
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_space_logo" class="form-label">Text: <span class="text-danger">*</span></label>
+                        {{ form.testimonial_text }}
+                    </div>
+                    {% if form.star_rating %}
+                    <div class="mb-3">
+                        <label for="star-rating">Star Rating:<span class="text-danger">*</span></label>
+                        <div id="star-rating" style="font-size: 2rem;">
+                            {% for i in form.star_rating.field.choices %}
+                                <input type="radio" name="star_rating" value="{{ i.0 }}" id="star{{ i.0 }}" class="d-none">
+                                <label for="star{{ i.0 }}" class="star" style="cursor: pointer;">
+                                    <i class="bi bi-star-fill" data-value="{{ i.0 }}" style="color: #ccc;"></i> <!-- Correct data-value -->
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="id_space_logo" class="form-label">Your Name: <span class="text-danger">*</span></label>
+                        {{ form.sender_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_space_logo" class="form-label">Your Email: <span class="text-danger">*</span>&nbsp;
+                            <i class="bi bi-info-circle" title="Your email address will not be shared publicly"></i> 
+                        </label>
+                        {{ form.sender_email }}
+                    </div>                
+                <style>
+                  .star {
+                        transition: color 0.2s ease;
+                    }
+                </style>
+
+            </div>
+
+            
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Submit Testimonials</button>
+            </div>
+        </form>
+          </div>
+        </div>
+      </div><!-- End Vertically centered Modal-->
+</div>
+
+           
+      
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- JavaScript to handle star selection -->
+<!-- JavaScript to handle star selection -->
+<script>
+ const stars = document.querySelectorAll('#star-rating .star');
+
+stars.forEach(star => {
+    star.addEventListener('click', function() {
+        const starValue = parseInt(this.querySelector('i').getAttribute('data-value'));
+        console.log("Star Selected: ", starValue); // Log selected star value
+
+        // Set all stars to gray first
+        stars.forEach(s => {
+            s.querySelector('i').style.color = '#ccc';
+        });
+
+        // Set the selected star and all previous stars to gold
+        for (let i = 0; i < starValue; i++) {
+            stars[i].querySelector('i').style.color = '#f5c518';
+        }
+
+        // Check the corresponding radio button
+        const radio = document.getElementById('star' + starValue);
+        if (radio) {
+            radio.checked = true; // Ensure the correct radio button is selected
+            console.log("Checked Radio Value: ", radio.value); // Log the value of the checked radio
+        }
+    });
+});
+
+
+
+
+
+
+
+
+</script>
+
+
+{% endblock %}

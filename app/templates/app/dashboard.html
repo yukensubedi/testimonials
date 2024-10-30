@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block pagetitle %}Dashbaord{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="#">Home</a></li>
+    <li class="breadcrumb-item active">Dashbaord</li>
+{% endblock %}
+
+{% block content %}
+
+
+<section class="section dashboard">
+  
+    <div class="row">
+
+      <!-- Left side columns -->
+      <div class="col-lg-8">
+        <div class="row">
+
+          <!-- Spaces Card -->
+          <div class="col-xxl-4 col-md-6">
+            <div class="card info-card sales-card">
+
+              <div class="card-body">
+                <h5 class="card-title">Spaces <span>| Total</span></h5>
+
+                <div class="d-flex align-items-center">
+                  <div class="ps-3">
+                    <h6>{{ spaces_count }}</h6>
+                    <!-- <span class="text-success small pt-1 fw-bold">out of 10</span>  -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div><!-- End spaces Card -->
+
+          <!-- Testimonials Card -->
+          <div class="col-xxl-4 col-md-6">
+            <div class="card info-card revenue-card">
+
+              <div class="card-body">
+                <h5 class="card-title">Testimonials <span>| Total</span></h5>
+
+                <div class="d-flex align-items-center">
+                   
+                    <div class="ps-3">
+                      <h6>{{ testimonial_count }}</h6>
+                     
+  
+                    </div>
+                  </div>
+              </div>
+
+            </div>
+          </div><!-- End Testimonials Card -->
+
+          <!-- Current Plan Card -->
+          <div class="col-xxl-4 col-xl-12">
+
+            <div class="card info-card customers-card">
+
+              <div class="card-body">
+                <h5 class="card-title">Current Plan  <span>| </span></h5>
+
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="ps-3">
+                        <h6>Starter</h6>
+                    </div>
+                    <button type="button" class="btn btn-warning text-white"><i class="bi  bi-cloud-arrow-up-fill"></i> Upgrade </button>
+                </div>
+                
+              </div>
+            </div>
+
+          </div><!-- End Customers Card -->
+
+         <!-- Spaces -->
+         <!-- <div class="col-12">
+            <div class="card top-selling overflow-auto">
+
+              <div class="card-body pb-0">
+                <h5 class="card-title">Your Spaces <span>| {{ spaces_count }}</span></h5>
+
+                <table class="table table-borderless">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sn</th>
+                            <th scope="col">Space Name</th>
+                            <th scope="col">Total Testimonials Received</th>
+                            <th scope="col">Created at</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for space in spaces %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th> 
+                            <td>
+                                <a href="#" class="text-primary fw-bold">{{ space.spaces_name }}</a>
+                            </td>
+                            <td>{{ space.testimonials.count }}</td>   
+                            <td>{{ space.created_at|date:"Y-m-d H:i" }}</td>  
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No spaces found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+
+              </div>
+
+            </div>
+          </div> -->
+          <!-- End Spaces -->
+          
+        
+         <!-- Spaces Test -->
+
+         
+      
+<div class="col-12">
+    <div class="card recent-sales overflow-auto">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3"> <!-- Flex container for alignment -->
+                <h5 class="card-title">Spaces <span> | {{ spaces_count }}</span></h5>
+               <a href="{% url 'create_spaces' %}"> <button type="button" class="btn btn-primary text-white"><i class="bi  bi-plus"></i> Create Spaces </button></a>
+
+                <!-- <a href="" class="btn btn-primary">Create Spaces</a> Adjust the URL as necessary -->
+            </div>
+            <!-- <h5 class="card-title">Spaces <span> | {{ spaces_count }}</span></h5> -->
+            <div id="copy-notification" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background-color:#333; color:#fff; padding:10px 20px; border-radius:5px; z-index:1050;">
+              Link copied!
+          </div>
+            <table class="table table-borderless datatable">
+              
+                <thead>
+                    <tr>
+                        <th scope="col">SN</th>
+                        <th scope="col">Spaces Name</th>
+                        <th scope="col">Total Testimonials Received</th>
+                        <th scope="col">Created at</th>
+                        <th scope="col">Action</th> <!-- Added Status column -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for space in spaces %}
+
+                    <tr>
+                        <th scope="row"><a href="#">{{ forloop.counter }}</a></th>  
+                        <td><a href="{% url 'spaces_detail' space.slug %}">{{ space.spaces_name }} </a></td>
+                        <td class="text-center">{{ space.testimonials.count }}</td>  
+                        {{ link }}
+                        <td>{{ space.created_at|date:"Y-m-d H:i" }}</td>  
+                        <td>
+                          <a alt="view" href="{% url 'spaces_detail' space.slug %}" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="View" title="View Space">
+                               
+                            <i class="bi bi-eye-fill fs-5" title="View"></i>
+                        </a>
+                          <a onclick="copyLink('{{ space.generated_link }}', event)"  alt="Copy Link" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Copy Link" title="Copy Link">
+                               
+                            <i class="bi bi-clipboard-check-fill fs-5" title="Copy Link"></i>
+                        </a>
+                          
+                            
+                            
+                            
+
+                          
+                        
+            
+                        </td>
+                    </tr>
+                    {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No spaces found.</td>
+            </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- End Spaces Test -->
+
+          
+          
+
+        </div>
+      </div><!-- End Left side columns -->
+
+      <!-- Right side columns -->
+      <div class="col-lg-4">
+        <!-- Recent Activity -->
+        <div class="card">
+
+          <div class="card-body">
+            <h5 class="card-title">Recent Testimonials <span>| Today</span></h5>
+
+            <div class="activity">
+                
+                <div class="today-testimonials">
+                    
+                    <div class="news">
+                        {% for testimonial in recent_testimonials %}
+                        <a href="">
+                            <div class="post-item clearfix mb-4 border p-3 rounded bg-light">
+                                <img src="{{ testimonial.spaces.spaces_logo.url }}" alt="" class="testimonial-logo" style="width: 80px; height: 80px;">
+                                <div class="testimonial-content">
+                                    <span class="testimonial-time ms-3">{{ testimonial.created_at|timesince }} ago</span>
+                                    <h4>
+                                        <a href="#" class="text-primary">{{ testimonial.spaces.spaces_name }}</a> 
+                                        <small class="text-muted">received a testimonial from </small>   <strong>{{ testimonial.sender_name }}</strong>                              
+                                    </h4>
+                                    <p class="mb-1 truncate">{{ testimonial.testimonial_text }}</p> 
+                                </div>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="post-item clearfix">
+                            <p>No testimonials received today.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    
+                    
+                </div>
+                <style>
+                    .truncate {
+                        display: -webkit-box; /* Use flexbox */
+                        -webkit-box-orient: vertical; /* Orient vertically */
+                        -webkit-line-clamp: 1; /* Show only one line */
+                        overflow: hidden; /* Hide overflow text */
+                        text-overflow: ellipsis; /* Add ellipsis for overflow text */
+                    }
+
+                   
+
+
+                </style>
+            </div>
+            
+          </div>
+        </div><!-- End Recent Activity -->
+
+        
+      </div><!-- End Right side columns -->
+
+    </div>
+  </section>
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function copyLink(linkText, event) {
+      // Prevent page refresh
+      event.preventDefault();
+
+      navigator.clipboard.writeText(linkText).then(() => {
+          const notification = document.getElementById("copy-notification");
+          notification.style.display = "block";
+          setTimeout(() => {
+              notification.style.display = "none";
+          }, 1500);
+      }).catch((error) => {
+          console.error("Could not copy text: ", error);
+      });
+  }
+</script>
+{% endblock %}
