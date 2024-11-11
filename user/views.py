@@ -83,7 +83,7 @@ class AuthGoogleView(View):
             token = request.POST['credential']
             return id_token.verify_oauth2_token(
                 token, google_requests.Request(), settings.GOOGLE_OAUTH_CLIENT_ID, 
-                clock_skew_in_seconds=30
+                clock_skew_in_seconds=40
             )
         except Exception as e:
             raise ValueError("Google token verification failed", e) from e
