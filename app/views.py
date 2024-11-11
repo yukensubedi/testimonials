@@ -12,17 +12,33 @@ from django.urls import reverse_lazy, reverse
 from django.db.models import Avg, Count
 from django.utils import timezone
 from django.core.paginator import Paginator
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
+from django.core.exceptions import ValidationError
 
 from .models import Spaces, Question, Testimonials, WallofLove
-from .forms import SpacesForm, QuestionFormSet, TestimonialForm
+from .forms import SpacesForm, QuestionFormSet, TestimonialForm, SampleForm
 from django_filters.views import FilterView
 from .filters import SpacesFilter
+from .tasks import send_email
+import json
 
 
 def test_view(request):
-    messages.warning(request, 'Test Complete')
-    return render(request, 'app/test.html')
+    subject = "Welcome to Our Platform"
+    template_path = "emails/test"  # Path to your email template
+    receiver = ["rukn500@gmail.com"]
+    merge_data = {
+            "user_name": request.user.first_name, 
+            "welcome_message": "Thank you for joining us!"
+        }
+
+        # Send email asynchronously
+    try:
+            send_email.delay(subject, template_path, receiver, merge_data)
+            messages.success(request, "Email has been sent successfully!")
+    except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+    return HttpResponse('Emnailsent')
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'app/dashboard.html'
@@ -46,7 +62,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         return context
 
+
+
 class SpacesCreateView(LoginRequiredMixin, CreateView):
+    """
+    View to create a Spaces with questions 
+    """
     model = Spaces
     form_class = SpacesForm
     template_name = 'app/create_space.html'
@@ -55,8 +76,11 @@ class SpacesCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+       
+        
+
         if self.request.POST:
-            context['formset'] = QuestionFormSet(self.request.POST)
+            context['formset'] = QuestionFormSet(self.request.POST, self.request.FILES)
         else:
             context['formset'] = QuestionFormSet()
         context['max_questions'] = self.max_questions
@@ -65,28 +89,45 @@ class SpacesCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         context = self.get_context_data()
         formset = context['formset']
-
+       
+       
         if len(formset) > self.max_questions:
             messages.warning(self.request, f"You can only add up to {self.max_questions} questions.")
             return self.form_invalid(form)
         
-        if not formset:
-            messages.warning(self.request, "No questions added")
+        if not formset.is_valid():
+            messages.warning(self.request, "Please correct the errors in the questions.")
             return self.form_invalid(form)
 
-        if form.is_valid() and formset.is_valid():
-            space = form.save(commit=False)
-            space.user = self.request.user
-            space.save()  
-            
-            formset.instance = space  
-            formset.save()   
-            messages.success(self.request, "Spaces with questions created successfully")
-            return redirect(self.success_url)
-        else:
+        
+        has_valid_question = any(
+            question_form.cleaned_data and not question_form.cleaned_data.get('DELETE', False)
+            for question_form in formset
+        )
+
+        if not has_valid_question:
+            form.add_error(None, "Please add at least one question.")
             return self.form_invalid(form)
 
+        try:
+            if form.is_valid() and formset.is_valid():
+                space = form.save(commit=False)
+                space.user = self.request.user
+                space.full_clean()  
+                space.save()
+                
+                formset.instance = space  
+                formset.save()
+                messages.success(self.request, "Spaces with questions created successfully")
+                return redirect(self.success_url)
+        except ValidationError as e:
+            for field, errors in e.message_dict.items():
+                for error in errors:
+                    form.add_error(field, error)
+        return self.form_invalid(form)
+    
 class TestimonialCollectView(DetailView):
+
     """
     View to show the details of the spaces to collect testimonials   
     """
@@ -96,7 +137,6 @@ class TestimonialCollectView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         space = self.object
-        print(self.object.id)
         
         # Fetch all questions related to the space
         context['questions'] = space.questions.all()
@@ -113,9 +153,42 @@ class TestimonialCollectView(DetailView):
             testimonial = form.save(commit=False)
             testimonial.spaces = self.object  
             testimonial.save()  
+
+
+            space_owner_subject = f"New Testimonial Received for {self.object.spaces_name}"
+            space_owner_template = 'emails/testimonial_received'
+            space_owner_receiver = [self.object.user.email]  # Assuming space owner is self.object.user
+            space_owner_merge_data = {
+                'space_name': self.object.spaces_name,
+                'space_owner_name': self.object.user.get_full_name(),
+                'testimonial_text': testimonial.testimonial_text,
+                'user_name': testimonial.sender_name,
+                'user_email': testimonial.sender_email,
+                'url' : self.request.build_absolute_uri(reverse('spaces_detail', args=[self.object.slug]))
+            }
+
+            # Prepare data for the email to the sender (thank you message)
+            sender_subject = "Thank You for Your Testimonial"
+            sender_template = 'emails/thank-you'
+            sender_receiver = [testimonial.sender_email]  
+            sender_merge_data = {
+                'space_name': self.object.spaces_name,
+                'testimonial_text': testimonial.testimonial_text,
+                'user_name': testimonial.sender_name,
+            }
+
+            # Send the email to the space owner
+            send_email.delay(subject=space_owner_subject, template_path=space_owner_template, 
+                             receiver=space_owner_receiver, merge_data=space_owner_merge_data)
+
+            # Send the email to the sender (thanking them)
+            send_email.delay(subject=sender_subject, template_path=sender_template, 
+                             receiver=sender_receiver, merge_data=sender_merge_data)
+
+            url = self.request.build_absolute_uri(reverse('spaces_testimonials_detail', args=[self.object.slug]))
+
             messages.success(self.request, 'Testimonial Provided Successfully')
-            # todo: Redirect to dynamic thankyou page
-            return redirect(reverse('spaces_detail', args=[self.object.slug]))  
+            return render(request, 'app/thankyou.html', {'url':url})
         
         return self.render_to_response(self.get_context_data(form=form))
 
@@ -150,7 +223,7 @@ class SpacesUpdateView(LoginRequiredMixin, UpdateView):
 
 class SpacesDetailView(LoginRequiredMixin, DetailView):
     model = Spaces
-    template_name = 'app/test.html'   
+    template_name = 'app/spaces_details.html'   
     context_object_name = 'space'
     slug_url_kwarg = 'slug'   
     paginate_by = 6
@@ -182,34 +255,60 @@ class SpacesDetailView(LoginRequiredMixin, DetailView):
             context['total_testimonials'] = total
         
         context['wall_of_love_ids'] = set(wall_of_love_ids)  
+        # Generate the embed URL
+        embed_url = self.request.build_absolute_uri(reverse('embed_wall_of_love', args=[space.slug]))
+        context['url'] = embed_url
         
         return context
     
-  
-        
-class EmbedWallOfLoveView(ListView):
-    model = WallofLove
-    template_name = "app/embed_wall_of_love.html"
-    context_object_name = 'wall_of_love_testimonials'
-
-    def get_queryset(self):
-        slug = self.kwargs.get("slug")
-        space = get_object_or_404(Spaces, slug=slug)
-
-        return WallofLove.objects.filter(testimonial__spaces= space).order_by('-created_at')
+    def dispatch(self, request, *args, **kwargs):
+        space = self.get_object()
+        # Check if the logged-in user is the space owner
+        if space.user != request.user:
+            messages.warning(request, 'You are not allowed to access this')
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
     
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        response["X-Frame-Options"] = "ALLOWALL"  # Allow embedding in iframes
-        return response
+    
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['space'] = get_object_or_404(Spaces, slug=self.kwargs['slug'])
-        return context
+class SpacesDeleteView(LoginRequiredMixin, DeleteView):
+    model = Spaces
 
 
-           
+    def post(self, request, *args, **kwargs):
+        self.get_object().delete()
+        redirect_url = request.POST.get('next', 'dashboard') 
+        messages.success(request, 'Spaces successfully deleted')
+        return redirect(redirect_url)
+    
+    def dispatch(self, request, *args, **kwargs):
+        space = self.get_object()
+        # Check if the logged-in user is the space owner
+        if space.user != request.user:
+            return HttpResponseForbidden("You are not allowed to delete this space.")
+        return super().dispatch(request, *args, **kwargs)
+    
+def wall_of_love_json(request, slug):
+    """
+    View to display the embedding content from wall of love.  
+    """
+    space = get_object_or_404(Spaces, slug=slug)
+    
+    # Get all testimonials in WallOfLove for this space
+    wall_of_love_testimonials = WallofLove.objects.filter(testimonial__spaces=space).values(
+        'testimonial__testimonial_text',
+        'testimonial__created_at',
+        'testimonial__sender_name',
+        'testimonial__star_rating',
+        'testimonial__id'
+    ).order_by('-testimonial__created_at')
+    testimonials_json = json.dumps(list(wall_of_love_testimonials), default=str)
+    # Prepare the data for JSON response
+    response = render(request, 'app/embed_wall_of_love.html', {'testimonials_json': testimonials_json})
+    response['X-Frame-Options'] = 'ALLOWALL'  
+    return response
+
+
 class TestimonialDeleteView(LoginRequiredMixin, DeleteView):
     model = Testimonials
 
@@ -228,7 +327,10 @@ class TestimonialDeleteView(LoginRequiredMixin, DeleteView):
         return super().dispatch(request, *args, **kwargs)
     
 
-class WallofLoveView(LoginRequiredMixin, View):
+class WallofLoveCreateView(LoginRequiredMixin, View):
+    """
+    View to create and remove the testimonial from wall of love.   
+    """
     def post(self, request, testimonial_id):
         testimonial = get_object_or_404(Testimonials, id=testimonial_id)
 
@@ -246,26 +348,6 @@ class WallofLoveView(LoginRequiredMixin, View):
         return redirect(redirect_url) 
     
 
-class WallofLoveListView(LoginRequiredMixin, ListView):
-    model = Spaces
-    template_name = 'app/walloflovelist.html'  # Update with your actual template name
-    context_object_name = 'spaces'
-
-    def get_queryset(self):
-        # Get the logged-in user's Wall of Love testimonials
-        user_wall_of_love = WallofLove.objects.filter(user=self.request.user)
-        # Annotate spaces with the count of testimonials in the Wall of Love
-        return (Spaces.objects
-                .filter(testimonials__in=user_wall_of_love.values('testimonial'))
-                .annotate(testimonial_count=Count('testimonials'))
-                .distinct())
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['wall_of_love'] = WallofLove.objects.filter(user=self.request.user)
-        
-        return context
-    
 class SpacesListView(LoginRequiredMixin, FilterView):
     """ View to list the spaces of the user with filtering capabilities"""
     model = Spaces
@@ -290,4 +372,3 @@ class SpacesListView(LoginRequiredMixin, FilterView):
             space.generated_link = space.generate_space_details_link(self.request)
         return context
     
-  

@@ -4,7 +4,8 @@ from user.models import AuditableModel
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
-
+from django.core.exceptions import ValidationError
+import os
 
 User = get_user_model()
 
@@ -38,8 +39,6 @@ class Spaces(AuditableModel):
     def generate_space_details_link(self, request):
          return f"{request.build_absolute_uri(reverse('spaces_testimonials_detail', args=[self.slug]))}"
 
-
-    
     class Meta:
         ordering = ['-created_at']   
 
@@ -65,3 +64,9 @@ class Testimonials(AuditableModel):
 class WallofLove(AuditableModel):
     user = models.ForeignKey(User, related_name='wall_of_love_users', on_delete=models.CASCADE)
     testimonial = models.ForeignKey(Testimonials, related_name='wall_of_love_testimonials', on_delete=models.CASCADE)
+
+    def generate_embed_url(self, request):
+        # Get the slug of the space associated with the testimonial
+        space_slug = self.testimonial.spaces.slug
+        # Build the URL using reverse and request
+        return request.build_absolute_uri(reverse('embed_wall_of_love', args=[space_slug]))

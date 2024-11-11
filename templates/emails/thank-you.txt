@@ -1,0 +1,9 @@
+Thank You for Your Testimonial
+
+Dear {{ user_name }},
+
+Thank you for submitting your testimonial for {{ space_name }}!
+
+Your testimonial: {{ testimonial_text }}
+
+We appreciate your contribution and look forward to your continued participation.

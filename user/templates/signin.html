@@ -6,39 +6,35 @@
 
 
 {% block content %}
-<div class="container">
-    {% if user.is_authenticated %}
-    <div>
-        <p>Hi {{ request.session.user_data.given_name }} {{ user.first_name}}🙂</p>
-        <p>Your email is {{ user.email }}</p>
-        {% if user.profile_image %}
-        <img src="{{ user.profile_image.url }}" alt="User picture">
-        {% endif %}
-        <p>Click here to <a href="{% url 'logout' %}">Sign out</a></p>
+
+
+    <div class="row justify-content-center align-items-center" style="height: 80vh;">
+        <div class="col-md-2">
+            <div class="card shadow" style="border-radius: 15px;">
+                <div class="card-body text-center p-5">
+                    <h2 class="mb-4" style="color: #1a73e8;">Sign In</h2>
+                    <p class="mb-4">Use your Google Account to continue</p>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div id="g_id_onload"
+                        data-client_id="223312939105-gcaj82e57bndud9f06j24kqo5dh9ar5h.apps.googleusercontent.com"
+                        data-context="signin"
+                        data-ux_mode="redirect"
+                        data-login_uri="http://localhost:8000/auth-receiver"
+                        data-auto_prompt="false">
+                   </div>
+                   
+                   <div class="g_id_signin"
+                        data-type="standard"
+                        data-shape="pill"
+                        data-theme="outline"
+                        data-text="signin_with"
+                        data-size="large"
+                        data-logo_alignment="left">
+                   </div>
+                </div>
+            </div>
+        </div>
     </div>
-    {% else %}
-    <div>
-        <p>Hi there 🙂 </p>
-        <p>Click below to sign in with Google</p>
-        <div id="g_id_onload"
-        data-client_id="223312939105-gcaj82e57bndud9f06j24kqo5dh9ar5h.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="redirect"
-        data-login_uri="http://localhost:8000/auth-receiver"
-        data-auto_prompt="false">
-   </div>
-   
-   <div class="g_id_signin"
-        data-type="standard"
-        data-shape="pill"
-        data-theme="outline"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left">
-   </div>
-    </div>
-    {% endif %}
-</div>
 {% endblock %}
 
 

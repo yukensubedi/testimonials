@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Our Platform</title>
+    <style>
+        /* Inline styling for better compatibility */
+        .email-body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+        .header { font-size: 24px; font-weight: bold; color: #4CAF50; }
+        .content { font-size: 16px; }
+        .footer { font-size: 12px; color: #777; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="email-body">
+        <p class="header">Hello {{ user_name }},</p>
+
+        <p class="content">
+            Welcome to Our Platform!
+        </p>
+
+        <p class="content">
+            {{ welcome_message }}
+        </p>
+
+        <p class="content">
+            We’re excited to have you on board. Feel free to explore and let us know if you have any questions.
+        </p>
+
+        <p class="footer">Best regards,<br>The Team</p>
+    </div>
+</body>
+</html>

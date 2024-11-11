@@ -71,6 +71,7 @@
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
                             <i class="bi bi-chat-quote-fill text-primary" style="font-size: 1.5rem;" title="Text Testimonial"></i>
+                            {% if testimonial.star_rating %}
                             <div class="mt-2" style="color: #ffc107;">
                                 {% for star in "★★★★★" %}
                                     {% if forloop.counter <= testimonial.star_rating %}
@@ -80,6 +81,7 @@
                                     {% endif %}
                                 {% endfor %}
                             </div>
+                            {% endif %}
                         </div>
                        
                         
@@ -139,65 +141,58 @@
            <!-- Wall of love modal -->
            <div class="modal fade" id="WallofLove" tabindex="-1" aria-labelledby="WallofLoveLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-xl">
-              <div class="modal-content border-0 shadow rounded-3">
-                <div class="modal-header border-0 pb-0">
-                  <h2 class="modal-title fw-bold text-center w-100" id="WallofLoveLabel">Embed a Wall of Love</h2>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center py-5">
-                  <div class="container">
-                    <div class="row row-cols-1 row-cols-md-2 g-4">
-                      {% for testimonial in wall_of_love_testimonials %}
-                      <div class="container mt-5">
-                        <div class="card shadow-sm" style="max-width: 300px;">
-                          <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
-                                   style="width: 48px; height: 48px; font-size: 1.2rem; margin-top: 5px;">
-                                RB
-                              </div>
-                              <h5 class="card-title mb-0">{{ testimonial.sender_name}}</h5>
-                              
-                            </div>
-                            <div class="mt-2" style="color: #ffc107;">
-                                {% for star in "★★★★★" %}
-                                  {% if forloop.counter <= testimonial.star_rating %}
-                                    <i class="bi bi-star-fill"></i>
-                                  {% else %}
-                                    <i class="bi bi-star"></i>
-                                  {% endif %}
-                                {% endfor %}
-                              </div>
-                            <p class="card-text">{{testimonial.testimonial_text}}</p>
-                            <p class="card-text"><small class="text-muted">{{ testimonial.created_at }}</small></p>
-                          </div>
-                        </div>
-                      </div>
-                      {% endfor %}
-                      
-                      
+                <div class="modal-content border-0 shadow rounded-3">
+                    <div class="modal-header border-0 pb-0">
+                        <h2 class="modal-title fw-bold text-center w-100" id="WallofLoveLabel">Embed a Wall of Love</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                  </div>
-                </div>
-                <div class="modal-footer border-0 d-flex justify-content-center">
-                  <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary btn-sm">Save changes</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          
+                    <div class="modal-body text-center py-5">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="embedCode" class="form-label">Copy and paste this code to embed:</label>
+                                   
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" id="embedCode"
+                                               value='<iframe src="{{ url }}" width="100%" height="500px" style="border:none;"></iframe>'
+                                               readonly>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('embedCode').value)">Copy</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Preview area here, if needed -->
+                            <iframe src="http://localhost:8000/embed/{{testimonial.spaces.slug}}/" width="100%" height="500px" style="border:none;"></iframe>
 
+
+
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 d-flex justify-content-center">
+                        <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary btn-sm">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        {% empty %}
+        <div class="d-flex flex-column align-items-center justify-content-center  text-muted">
+            <h3 class="mb-3">No Testimonials Yet!</h3>
+        </div>
 
         {% endfor %}
     </div>
+
+ 
    
-      
+     
+
+
+
 {% if testimonials %}
     <!-- Pagination Controls -->
-<!-- <div class="container fixed-bottom mb-5"> -->
-    <!-- Pagination Navigation -->
 <nav aria-label="Testimonials Pagination">
     <ul class="pagination justify-content-center">
         <!-- Previous Button -->

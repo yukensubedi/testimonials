@@ -3,144 +3,240 @@
 
 {% block title %}Create Spaces{% endblock %}
 
-{% block pagetitle %}Spaces{% endblock %}
-
-{% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="#">Spaces</a></li>
-    <li class="breadcrumb-item active">Create</li>
+{% block extra_css %}
+<style>
+    .preview-card {
+        max-width: 400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .preview-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .preview-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        background-color: #f0f0f0;
+        margin: 0 auto 1rem;
+        display: block;
+    }
+    .preview-content {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .preview-header {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    .preview-message {
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+    .preview-questions {
+        text-align: left;
+        margin-bottom: 1.5rem;
+    }
+    .preview-questions h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    .preview-questions ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        color: #666;
+    }
+    .preview-questions li {
+        margin-bottom: 0.25rem;
+    }
+    .send-button {
+        background-color: #0066ff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.75rem;
+        width: 100%;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .send-button:hover {
+        background-color: #0052cc;
+    }
+    .upgrade-text {
+        color: #666;
+        font-size: 0.875rem;
+    }
+    .form-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+    .question-row {
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+    .remove-question {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .question-row:hover .remove-question {
+        opacity: 1;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row">
+    <div class="row g-4">
         <!-- Left Column: Live Preview -->
-        <div class="col-md-4">
-            <div class="container">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        Live preview - Testimonial page
-                    </div>
-                    <br>
-                    <div class="card-body">
-                        <div class="text-center mb-4">
-                            <img id="preview-space-logo" src="https://via.placeholder.com/200x200.png?text=No+Image" alt="Profile" class="mb-3" style="width: 200px; height: 200px; object-fit: cover;">
-                            <h2 class="h4" id="preview-header-title">Header goes here...</h2>
-                            <p class="text-muted" id="preview-message">Your custom message goes here...</p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h3 class="h5 mb-3">QUESTIONS</h3>
-                            <ul id="preview-questions" class="list-unstyled">
-                                <li class="mb-2">• No questions added yet...</li>
-                            </ul>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-primary">
-                                <i class="bi bi-camera-video me-2"></i> Record a video
-                            </button>
-                            <button class="btn btn-secondary">
-                                <i class="bi bi-pencil me-2"></i> Send in text
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-footer text-muted text-center">
-                        <small>👉 Upgrade to Premium </small>
-                    </div>
+        <div class="col-lg-4">
+            <div class="preview-card">
+                <div class="card-header bg-success text-white">
+                    Live preview - Testimonial page
                 </div>
+                <div class="preview-content">
+                    <img id="preview-space-logo" src="https://via.placeholder.com/200x200.png?text=No+Image" alt="Space Logo" class="preview-image">
+                    <h2 id="preview-header-title" class="preview-header">Header goes here...</h2>
+                    <p id="preview-message" class="preview-message">Your custom message goes here...</p>
+                    
+                    <div class="preview-questions">
+                        <h3>QUESTIONS</h3>
+                        <ul id="preview-questions">
+                            <li>• No questions added yet...</li>
+                        </ul>
+                    </div>
+
+                    <button class="send-button">
+                        <i class="bi bi-pencil"></i>
+                        Send in text
+                    </button>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    <small>👉 Upgrade to Premium </small>
+                </div>     
             </div>
         </div>
 
         <!-- Right Column: Form -->
-        <div class="col-md-8">
-            <div class="card shadow-sm p-4">
-                <div class="text-center">
-                    <h2 class="h1 mb-3 fw-bold text-secondary">Create a New Space</h2>
-                    <p class="text-muted">After the Space is created, it will generate a dedicated page for collecting testimonials.</p>
-                </div>
+        <div class="col-lg-8">
+            <div class="form-section">
+                <h2 class="h3 mb-4 text-center">Create a New Space</h2>
+                <p class="text-muted text-center mb-5">After the Space is created, it will generate a dedicated page for collecting testimonials.</p>
                 
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="create-space-form" novalidate>
                     {% csrf_token %}
-                    
-                    <!-- Space Name -->
-                    <div class="mb-3">
-                        <label for="id_space_name" class="form-label">Space Name <span class="text-danger">*</span></label>
+
+                    {% if form.non_field_errors %}
+                        <ul class="errorlist">
+                            {% for error in form.non_field_errors %}
+                                <li class="text-danger">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <div class="mb-4">
+                        <label for="{{ form.spaces_name.id_for_label }}" class="form-label">Space Name <span class="text-danger">*</span></label>
                         {{ form.spaces_name }}
-                        <div class="invalid-feedback">
-                            Please provide a valid space name.
-                        </div>
+                        {% if form.spaces_name.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.spaces_name.errors %}
+                                <li class="text-danger">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                     </div>
 
-                    <!-- Header Title -->
-                    <div class="mb-3">
-                        <label for="id_header_title" class="form-label">Header Title <span class="text-danger">*</span></label>
+                    <div class="mb-4">
+                        <label for="{{ form.header_title.id_for_label }}" class="form-label">Header Title <span class="text-danger">*</span></label>
                         {{ form.header_title }}
-                        <div class="invalid-feedback">
-                            Please provide a valid header title.
-                        </div>
+                        {% if form.header_title.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.header_title.errors %}
+                                <li class="text-danger">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                     </div>
 
-                    <!-- Message -->
-                    <div class="mb-3">
-                        <label for="id_message" class="form-label">Custom Message <span class="text-danger">*</span></label>
+                    <div class="mb-4">
+                        <label for="{{ form.message.id_for_label }}" class="form-label">Custom Message <span class="text-danger">*</span></label>
                         {{ form.message }}
-                        <div class="invalid-feedback">
-                            Please provide a message.
-                        </div>
+                        {% if form.message.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.message.errors %}
+                                    <li class="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                     </div>
 
-                    <!-- Space Logo -->
-                    <div class="mb-3">
-                        <label for="id_space_logo" class="form-label">Space Logo <span class="text-danger">*</span></label>
+                    <div class="mb-4">
+                        <label for="{{ form.spaces_logo.id_for_label }}" class="form-label">Space Logo <span class="text-danger">*</span></label>
                         {{ form.spaces_logo }}
-                        <div class="invalid-feedback">
-                            Please upload a logo for the space.
-                        </div>
+                        {% if form.spaces_logo.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.spaces_logo.errors %}
+                                    <li class="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                         <small class="form-text text-muted">
                             Recommended size: 200x200 pixels. Maximum file size: 5MB.
                         </small>
                     </div>
 
-                    <!-- Star Rating Toggle -->
-                    <div class="form-check form-switch mb-3">
+                    <div class="form-check form-switch mb-4">
                         {{ form.star_rating }}
-                        <label class="form-check-label" for="id_star_rating">Collect Star rating</label>
+                        <label class="form-check-label" for="{{ form.star_rating.id_for_label }}">Collect Star rating</label>
+                        {% if form.star_rating.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.star_rating.errors %}
+                                    <li class="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                     </div>
 
-                    <!-- Questions Section -->
-                    <h3 class="h4 mb-3">Questions <span class="text-danger">*</span></h3> 
-                    <small>(Upto  {{max_questions}} Questions) </small>
-                    <p id="messageContainer" class="text-danger font-italic" style="display: none;">You can only add upto {{max_questions}} questions. </p>
+                    <h3 class="h5 mb-3">Questions <span class="text-danger">*</span></h3>
+                    <small class="text-muted">(Up to {{ max_questions }} Questions)</small>
+                    <p id="question-limit-message" class="text-danger font-italic mt-2" style="display: none;">You can only add up to {{ max_questions }} questions.</p>
 
-                    <div id="question-formset">
+                    <div id="question-formset" class="mb-4">
                         {{ formset.management_form }}
                         <div id="forms-container">
                             {% for form in formset %}
-                                <div class="form-row mb-3 d-flex align-items-center question-row" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
-                                    <div class="col-10">
-                                        {{ form.question_text }}
-                                    </div>
-                                    <div class="col-2 text-end">
-                                        <button type="button" class="remove-form btn btn-danger btn-sm" title="Remove this question">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
+                                <div class="question-row">
+                                    {{ form.question_text }}
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-question" title="Remove this question">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             {% endfor %}
                         </div>
-                       
-                        
                     </div>
 
-                    <br>
+                    <button type="button" id="add-question" class="btn btn-outline-primary mb-4">
+                        <i class="bi bi-plus-circle me-2"></i>Add Question
+                    </button>
 
-                    <!-- Add Question Button -->
-                    <div class="d-flex justify-content-between">
-                        <button type="button" id="add-form" class="btn btn-outline-primary mb-3">
-                            <i class="bi bi-plus-circle"></i> Add Question
-                        </button>
-                    </div>
-
+                    
                     <!-- Submit Button -->
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-primary mb-3">Create Space</button>
@@ -151,102 +247,99 @@
     </div>
 </div>
 
-
-{% endblock %}
-{% block extra_scripts %}
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-       // Your existing code
-       let formsetDiv = document.getElementById('forms-container');
-       let totalFormsInput = document.getElementById('id_questions-TOTAL_FORMS');
-       let formIndex = formsetDiv.querySelectorAll('.question-row').length;
-       let maxQuestions = {{ max_questions }}; 
-       let addButton = document.getElementById('add-form');
-       let messageContainer = document.getElementById('messageContainer');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('create-space-form');
+    const formsContainer = document.getElementById('forms-container');
+    const addQuestionBtn = document.getElementById('add-question');
+    const questionLimitMessage = document.getElementById('question-limit-message');
+    const maxQuestions = {{ max_questions }};
+    let formIndex = formsContainer.children.length;
 
-       // Add new image preview functionality
-       const logoInput = document.getElementById('id_spaces_logo');
-       const previewImage = document.getElementById('preview-space-logo');
+    function updatePreview() {
+        document.getElementById('preview-header-title').textContent = document.getElementById('id_header_title').value || 'Header goes here...';
+        document.getElementById('preview-message').textContent = document.getElementById('id_message').value || 'Your custom message goes here...';
 
-       logoInput.addEventListener('change', function(event) {
-           const file = event.target.files[0];
-           if (file) {
-               const reader = new FileReader();
-               reader.onload = function(e) {
-                   previewImage.src = e.target.result;
-               };
-               reader.readAsDataURL(file);
-           }
-       });
+        const previewQuestions = document.getElementById('preview-questions');
+        previewQuestions.innerHTML = '';
+        const questionInputs = formsContainer.querySelectorAll('input[name$="-question_text"]');
+        
+        if (questionInputs.length === 0 || (questionInputs.length === 1 && !questionInputs[0].value)) {
+            previewQuestions.innerHTML = '<li>• No questions added yet...</li>';
+        } else {
+            questionInputs.forEach((input) => {
+                if (input.value) {
+                    const li = document.createElement('li');
+                    li.textContent = `• ${input.value}`;
+                    previewQuestions.appendChild(li);
+                }
+            });
+        }
+    }
 
-       // Your existing functions
-       function updatePreview() {
-           document.getElementById('preview-header-title').textContent = document.getElementById('id_header_title').value || 'Header goes here...';
-           document.getElementById('preview-message').textContent = document.getElementById('id_message').value || 'Your custom message goes here...';
+    function addQuestion() {
+        if (formIndex < maxQuestions) {
+            const newForm = formsContainer.children[0].cloneNode(true);
+            const formRegex = RegExp(`questions-(\\d+)-`,'g');
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formIndex}-`);
+            newForm.querySelector('input').value = '';
+            formsContainer.appendChild(newForm);
+            formIndex++;
+            document.getElementById('id_questions-TOTAL_FORMS').value = formIndex;
+            updateQuestionLimit();
+            updatePreview();
+        }
+    }
 
-           let previewQuestions = document.getElementById('preview-questions');
-           previewQuestions.innerHTML = '';
-           let questionInputs = formsetDiv.querySelectorAll('input[name^="questions-"][name$="-question_text"]');
-           questionInputs.forEach((input, index) => {
-               let li = document.createElement('li');
-               li.textContent = input.value ? `• ${input.value}` : `• Question ${index + 1} goes here...`;
-               previewQuestions.appendChild(li);
-           });
-       }
+    function removeQuestion(event) {
+        if (formsContainer.children.length > 1) {
+            event.target.closest('.question-row').remove();
+            formIndex--;
+            document.getElementById('id_questions-TOTAL_FORMS').value = formIndex;
+            updateQuestionLimit();
+            updatePreview();
+        }
+    }
 
-       // Your existing code for adding/removing questions
-       function addQuestionForm() {
-           if (formIndex < maxQuestions) {
-               let newForm = formsetDiv.querySelector('.question-row').cloneNode(true);
-               let formRegex = new RegExp(`questions-(\\d+)-`, 'g');
-               newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formIndex}-`);
-               let inputs = newForm.querySelectorAll('input');
-               inputs.forEach(input => input.value = '');
-               formsetDiv.appendChild(newForm);
-               formIndex++;
-               totalFormsInput.value = formIndex;
+    function updateQuestionLimit() {
+        addQuestionBtn.disabled = formIndex >= maxQuestions;
+        questionLimitMessage.style.display = formIndex >= maxQuestions ? 'block' : 'none';
+    }
 
-               attachRemoveListeners();
-               checkQuestionLimit();
-           } 
-       }
+    addQuestionBtn.addEventListener('click', addQuestion);
+    formsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-question') || e.target.closest('.remove-question')) {
+            removeQuestion(e);
+        }
+    });
 
-       function removeQuestionForm(event) {
-           if (formsetDiv.children.length > 1) {
-               event.target.closest('.question-row').remove();
-               formIndex--;
-               totalFormsInput.value = formIndex;
-               checkQuestionLimit();
-           } else {
-               alert("You must have at least one question.");
-           }
-       }
+    ['id_spaces_name', 'id_header_title', 'id_message'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePreview);
+    });
 
-       function checkQuestionLimit() {
-           if (formIndex >= maxQuestions) {
-               addButton.disabled = true;
-               messageContainer.style.display = 'block';
-           } else {
-               addButton.disabled = false;
-               messageContainer.style.display = 'none';
-           }
-       }
+    document.getElementById('id_spaces_logo').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-space-logo').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
-       function attachRemoveListeners() {
-           let removeButtons = formsetDiv.querySelectorAll('.remove-form');
-           removeButtons.forEach(button => {
-               button.addEventListener('click', removeQuestionForm);
-           });
-       }
+    formsContainer.addEventListener('input', updatePreview);
 
-       document.getElementById('id_header_title').addEventListener('input', updatePreview);
-       document.getElementById('id_message').addEventListener('input', updatePreview);
-       formsetDiv.addEventListener('input', updatePreview);
-       addButton.addEventListener('click', addQuestionForm);
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    }, false);
 
-       attachRemoveListeners();
-       checkQuestionLimit();
-   });
+    updatePreview();
+    updateQuestionLimit();
+});
 </script>
 {% endblock %}
-

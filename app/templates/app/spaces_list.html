@@ -91,7 +91,7 @@
                                         </a>
 
                                         
-                                        <button class="btn btn-sm btn-outline-secondary " title="Delete" data-bs-toggle="modal" data-bs-target="#verticalycentered"><i class="bi bi-trash"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary " title="Delete" data-bs-toggle="modal" data-bs-target="#verticalycentered"><i class="bi bi-trash text-danger"></i></button>
                                        
                                          <!-- Vertically centered Modal -->
                                         <div class="modal fade" id="verticalycentered" tabindex="-1">
@@ -102,12 +102,16 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div> -->
                                                 <div class="modal-body">
-                                                    Are you sure you want to delete the space <a href="" class="text-danger">{{space.spaces_name}}</a>? <br>
-                                                    <small>All the testimonials datas will also be deleted. </small>
+                                                    Are you sure you want to delete the space <a class="text-danger">{{space.spaces_name}}</a>? <br>
+                                                    <small>All the testimonials associated with this spaces will also be deleted. </small>
                                                 </div>
                                                 <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-danger">Delete</button>
+                                                <form action="{% url 'spaces_delete' space.id %}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                                  <button type="submit" class="btn btn-danger">Delete</button>
+                                                  </form>
                                                 </div>
                                             </div>
                                             </div>

@@ -1,0 +1,7 @@
+New Testimonial Received
+
+Space Name: {{ space_name }}
+Testimonial: {{ testimonial_text }}
+From: {{ user_name }}
+
+Thank you for your contribution!

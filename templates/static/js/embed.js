@@ -1,31 +1,23 @@
 function resizeIframe(iframe) {
     const adjustIframeHeight = () => {
-        // Calculate the new height of the iframe
-        const newHeight = iframe.contentWindow.document.body.scrollHeight;
-        
-        // Set the iframe height
-        iframe.style.height = newHeight + 'px';
+        try {
+            // Accessing the iframe's content document
+            const body = iframe.contentWindow.document.body;
+            // Get the total height of the body including all content
+            const newHeight = body.scrollHeight;
+
+            // Set the iframe height
+            iframe.style.height = newHeight + 'px';
+        } catch (e) {
+            console.error("Error accessing iframe content:", e);
+        }
     };
 
-    // Initial height adjustment
-    adjustIframeHeight();
+    // Adjust height when the iframe loads
+    iframe.addEventListener('load', adjustIframeHeight);
 
-    // Set up a MutationObserver to detect changes in the content
-    const observer = new iframe.contentWindow.MutationObserver(() => {
-        adjustIframeHeight();
-    });
-
-    // Observe changes in the entire document
-    observer.observe(iframe.contentWindow.document.body, { childList: true, subtree: true });
-
-    // Also listen for window resize events
+    // Also adjust height on window resize
     window.addEventListener('resize', adjustIframeHeight);
-
-    // Clean up observer on iframe unload
-    iframe.contentWindow.addEventListener('beforeunload', () => {
-        observer.disconnect();
-        window.removeEventListener('resize', adjustIframeHeight);
-    });
 }
 
 // Ensure the script executes when the DOM is fully loaded

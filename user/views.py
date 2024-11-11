@@ -43,26 +43,27 @@ class AuthGoogleView(View):
     def post(self, request, *args, **kwargs):
         try:
             user_data = self.get_google_user_data(request)
+            email_verified = user_data.get('email_verified', False)
+
+            if not email_verified:
+                messages.warning(request, 'Sign in Failed. Email is not verified')
+                return redirect('sign_in')
+
         except ValueError as e:
             print(f"Token verification failed: {e}")
-            return HttpResponse("Invalid Google token", status=403)
+            messages.error(request, "Sign in failed")
+            return redirect('home')
 
-        print(user_data)
-        email = user_data["email"]
         email = user_data.get('email')
         first_name = user_data.get('given_name', user_data.get('name', ''))
-        last_name = user_data.get('family_name', first_name)  # Use 'first_name' as fallback if 'family_name' is missing
+        last_name = user_data.get('family_name', first_name)
         email_verified = user_data.get('email_verified', False)
         profile_image_url = user_data.get('picture')
 
-        if not email_verified:
-            messages.error(request, 'Sign in Failed. Email is not verified')
-            return redirect('sign_in')
-        
+     
 
-        user, created =User.objects.get_or_create(
+        user, created = User.objects.get_or_create(
             email=email, defaults={
-                "email": email,
                 "signup_method": "GOOGLE",
                 "first_name": first_name,
                 "last_name": last_name,
@@ -70,14 +71,10 @@ class AuthGoogleView(View):
             }
         )
 
-
         if created and profile_image_url:
             self.download_and_save_profile_image(user, profile_image_url)
-        
-            
+
         login(request, user)
-        
-        
         return redirect('dashboard')
 
     @staticmethod
@@ -86,7 +83,7 @@ class AuthGoogleView(View):
             token = request.POST['credential']
             return id_token.verify_oauth2_token(
                 token, google_requests.Request(), settings.GOOGLE_OAUTH_CLIENT_ID, 
-                clock_skew_in_seconds=20
+                clock_skew_in_seconds=30
             )
         except Exception as e:
             raise ValueError("Google token verification failed", e) from e
@@ -99,4 +96,3 @@ class AuthGoogleView(View):
                 user.profile_image.save(image_name, ContentFile(response.content), save=True)
         except Exception as e:
             print(f"Error downloading profile image: {e}")
-       

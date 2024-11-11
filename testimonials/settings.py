@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from logging.handlers import RotatingFileHandler
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -145,6 +147,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+
+# Email Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT=587
+EMAIL_HOST_USER="yukensubedi@gmail.com"
+EMAIL_HOST_PASSWORD="koeu lwmn qyru tbnm"
+EMAIL_USE_TLS=True
+
+
 GOOGLE_OAUTH_CLIENT_ID= '223312939105-gcaj82e57bndud9f06j24kqo5dh9ar5h.apps.googleusercontent.com'
 
 # We need these lines below to allow the Google sign in popup to work.
@@ -156,3 +169,60 @@ LOGIN_URL = "sign_in"
 # LOGIN_REDIRECT_URL = 'home'  # Redirect after login
 LOGOUT_REDIRECT_URL = 'home'  # Redirect after logout
 
+# Celery settings
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+broker_connection_retry_on_startup = True
+
+
+
+# logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,  # Keeps Django's default loggers
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file_info': {
+            'level': 'INFO',  # Log level for file output
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django_info.log'),
+            'formatter': 'verbose',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB per file
+            'backupCount': 5,  # Keep up to 5 backup log files
+        },
+        'file_error': {
+            'level': 'ERROR',  # Log level for errors only
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django_errors.log'),
+            'formatter': 'verbose',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB per file
+            'backupCount': 5,
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file_info', 'file_error'],  # Removed 'console' from handlers
+            'level': 'DEBUG',  # Set to DEBUG for more detailed logs in development; INFO or higher in production
+            'propagate': True,
+        },
+        'app': {  # Custom logger for your app
+            'handlers': ['file_info', 'file_error'],  # Removed 'console' from handlers
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

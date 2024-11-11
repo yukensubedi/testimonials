@@ -33,6 +33,9 @@
 
     {% block extra_head %}
     {% endblock %}
+
+    {% block extra_css %}
+    {% endblock %}
 </head>
 
 <body>
@@ -44,7 +47,7 @@
         <div class="d-flex align-items-center justify-content-between">
             <a href="#" class="logo d-flex align-items-center">
                 <img src="{% static 'img/logo.png' %}" alt="">
-                <span class="fw-bold fs-4 text-primary d-none d-lg-block">Testimonials</span>
+                <span class="fw-bold fs-4 d-none d-lg-block" style="color: #0D6Dfd;">Testimonials</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>
@@ -111,20 +114,16 @@
                 </a>
                 <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                   <li>
-                    <a href="{% url 'spaces_list' %}">
-                      <i class="bi bi-circle"></i><span>Spaces List</span>
-                    </a>
-                  </li>
-                  <li>
                     <a href="{% url 'create_spaces' %}">
                       <i class="bi bi-circle"></i><span>Create Spaces</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{% url 'wall_of_love_list' %}">
-                      <i class="bi  bi-circle"></i><span>Wall of Love</span>
+                    <a href="{% url 'spaces_list' %}">
+                      <i class="bi bi-circle"></i><span>Spaces List</span>
                     </a>
                   </li>
+                  
                   
                   <li>
                     <a href="forms-validation.html">
