@@ -1,47 +1,117 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive iFrame</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .iframe-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-        #responsive-iframe {
-            width: 100%;
-            border: none;
-            transition: height 0.3s ease;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="iframe-container">
-                    <iframe id="responsive-iframe" src="http://localhost:8000/embed/frontend-page-for-ukn/" scrolling="no"></iframe>
-                </div>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Update Space: {{ space.spaces_name }}</h2>
+    <form method="post" enctype="multipart/form-data" id="update-form">
+        {% csrf_token %}
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Space Details</h4>
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function resizeIframe() {
-            const iframe = document.getElementById('responsive-iframe');
-            iframe.style.height = 'auto'; // Reset height before calculating
-            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Questions</h4>
+                {{ formset.management_form }}
+                {% for question_form in formset %}
+                    <div class="mb-3">
+                        {{ question_form.id }}
+                        <label for="{{ question_form.question_text.id_for_label }}" class="form-label">Question {{ forloop.counter }}</label>
+                        {{ question_form.question_text }}
+                        {% if not forloop.last %}
+                            <div class="form-check mt-2">
+                                {{ question_form.DELETE }}
+                                <label class="form-check-label" for="{{ question_form.DELETE.id_for_label }}">
+                                    Delete this question
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Space</button>
+    </form>
+
+    <!-- Preview Section -->
+    <div class="card mt-5">
+        <div class="card-body">
+            <h4 class="card-title">Live Preview</h4>
+            <p><strong>Space Name:</strong> <span id="preview-space-name">{{ form.instance.spaces_name }}</span></p>
+            <p><strong>Header Title:</strong> <span id="preview-header-title">{{ form.instance.header_title }}</span></p>
+            <p><strong>Message:</strong> <span id="preview-message">{{ form.instance.message }}</span></p>
+            <div><strong>Questions:</strong></div>
+            <ul id="preview-questions">
+                {% for question_form in formset %}
+                    <li id="preview-question-{{ forloop.counter0 }}">{{ question_form.instance.question_text }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to update the preview based on form values
+        function updatePreview() {
+            // Update the preview for the main fields
+            document.getElementById('preview-header-title').textContent = document.getElementById('id_header_title').value || 'Header goes here...';
+            document.getElementById('preview-message').textContent = document.getElementById('id_message').value || 'Your custom message goes here...';
+
+            // Preview the questions
+            const previewQuestions = document.getElementById('preview-questions');
+            previewQuestions.innerHTML = ''; // Clear existing questions in preview
+
+            // Collect all question text fields (even pre-populated ones)
+            const questionInputs = document.querySelectorAll('[name$="-question_text"]');
+
+            // Check if no questions are present or all are empty
+            if (questionInputs.length === 0 || (questionInputs.length === 1 && !questionInputs[0].value)) {
+                previewQuestions.innerHTML = '<li>• No questions added yet...</li>';
+            } else {
+                // Iterate through each question input and update the preview dynamically
+                questionInputs.forEach((input) => {
+                    if (input.value) {
+                        const li = document.createElement('li');
+                        li.textContent = `• ${input.value}`;
+                        previewQuestions.appendChild(li);
+                    }
+                });
+            }
         }
 
-        window.addEventListener('load', function() {
-            const iframe = document.getElementById('responsive-iframe');
-            iframe.addEventListener('load', resizeIframe);
-            window.addEventListener('resize', resizeIframe);
+        // Call updatePreview on input events for the main fields
+        document.getElementById('id_header_title').addEventListener('input', updatePreview);
+        document.getElementById('id_message').addEventListener('input', updatePreview);
+
+        // Dynamically update the preview for questions
+        const questionInputs = document.querySelectorAll('[name$="-question_text"]');
+        questionInputs.forEach((input) => {
+            input.addEventListener('input', updatePreview);  // Update preview on input change
         });
-    </script>
-</body>
-</html>
+
+        // Initialize preview with the existing values
+        updatePreview(); 
+    });
+</script>
+
+   
+ 
+{% endblock %}

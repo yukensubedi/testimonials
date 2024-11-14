@@ -1,10 +1,16 @@
 import os
+import requests
 import logging
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 from celery import shared_task
 from smtplib import SMTPException
+from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+
+
+User=get_user_model()
 
 # Initialize the logger
 logger = logging.getLogger(__name__)
@@ -51,4 +57,27 @@ def send_email(self, subject, template_path, receiver=[], merge_data={}, file_pa
 
     except Exception as e:
         logger.error("An unexpected error occurred while sending email: %s", e)
-        raise
+         
+
+
+@shared_task
+def download_and_save_profile_image(user_id, profile_image_url):
+    """
+    Download and save the profile image for the specified user asynchronously.
+    """
+    try:
+        user = User.objects.get(pk=user_id)
+        
+        # Fetch the image from the URL
+        response = requests.get(profile_image_url)
+        
+        if response.status_code == 200:
+            image_name = f'{user.pk}_profile.jpg'
+            user.profile_image.save(image_name, ContentFile(response.content), save=True)
+            logger.info(f"Profile image saved for user {user.email}")
+        else:
+            logger.error(f"Failed to download image for user {user.email}: Status code {response.status_code}")
+    except User.DoesNotExist:
+        logger.error(f"User with id {user_id} does not exist.")
+    except Exception as e:
+        logger.error(f"Error downloading profile image for user {user_id}: {e}")

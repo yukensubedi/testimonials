@@ -85,7 +85,7 @@
                                            
                                         <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-clipboard-check-fill"></i></button>
                                     </a>
-                                        <a alt="Edit" href="{% url 'spaces_update' space.pk %}" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user" title="Edit">
+                                        <a alt="Edit" href="{% url 'spaces_update' space.slug %}" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user" title="Edit">
                                            
                                             <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
                                         </a>
@@ -121,7 +121,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center">No spaces created.</td>
+                                <td colspan="5" class="text-center">No spaces Found.</td>
                             </tr>
                         {% endfor %}
                     </tbody>

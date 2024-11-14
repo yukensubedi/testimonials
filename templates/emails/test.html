@@ -1,33 +1,134 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome to Our Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Testimonials</title>
     <style>
-        /* Inline styling for better compatibility */
-        .email-body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
-        .header { font-size: 24px; font-weight: bold; color: #4CAF50; }
-        .content { font-size: 16px; }
-        .footer { font-size: 12px; color: #777; margin-top: 20px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f5f7;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            animation: fadeIn 1s ease;
+        }
+
+        .logo {
+            width: 40px;
+            margin-right: 8px;
+        }
+
+        .logo-text {
+            font-size: 2em;
+            font-weight: bold;
+            color: #0D6Dfd;
+            margin: 0;
+        }
+
+        .welcome-heading {
+            font-size: 1.8em;
+            color: #6366f1;
+            margin: 16px 0;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .welcome-message {
+            font-size: 1.1em;
+            margin: 24px 0;
+            line-height: 1.7;
+            color: #666;
+            animation: fadeIn 2s ease;
+        }
+
+        .welcome-message p {
+            margin: 0;
+            font-size: 1.2em;
+            /* font-weight: bold; */
+            color: #333;
+        }
+
+        .explore-button {
+            background-color: #6366f1;
+            color: white;
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 32px;
+            animation: fadeIn 2.5s ease;
+        }
+
+        .explore-button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-3px);
+        }
+
+        .emoji {
+            font-style: normal;
+            margin-left: 4px;
+        }
+
+       
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 10px;
+            }
+            .card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="email-body">
-        <p class="header">Hello {{ user_name }},</p>
+    <div class="card">
+        <!-- Logo and Text Container -->
+        <div class="logo-container">
+            <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
+            <span class="logo-text">Testimonials</span>
+        </div>
 
-        <p class="content">
-            Welcome to Our Platform!
-        </p>
+        <div class="welcome-heading">
+            Welcome to Testimonials! <span class="emoji">🎉</span>
+        </div>
 
-        <p class="content">
-            {{ welcome_message }}
-        </p>
+        <div class="welcome-message">
+            <p>Hey {{ user_name }},</p>
+            <p>Thank you for signing up! We're thrilled to have you onboard. Testimonials is here to help you gather
+            genuine feedback and showcase it to the world. Start exploring all that we have to offer and let us know
+            if you need any assistance.</p>
+        </div>
 
-        <p class="content">
-            We’re excited to have you on board. Feel free to explore and let us know if you have any questions.
-        </p>
-
-        <p class="footer">Best regards,<br>The Team</p>
+        <a href="" class="explore-button">
+            Explore Your Dashboard
+        </a>
     </div>
 </body>
 </html>

@@ -34,6 +34,7 @@ class Spaces(AuditableModel):
             while Spaces.objects.filter(slug=self.slug).exists():
                 self.slug = f'{original_slug}-{counter}'
                 counter += 1
+        self.spaces_name = self.spaces_name.title()
         super().save(*args, **kwargs)
     
     def generate_space_details_link(self, request):

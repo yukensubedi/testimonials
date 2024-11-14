@@ -1,31 +1,26 @@
 import os
+import logging
 import requests
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
-from django.contrib.auth import login, get_user_model, logout
+from django.shortcuts import redirect
+from django.contrib.auth import login, get_user_model, authenticate
 from django.conf import settings
-from django.core.files.base import ContentFile
 from django.views.generic.base import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpRequest
 from django.contrib import messages
 from django.contrib.auth.views import LogoutView
 from django.urls import reverse_lazy
 
 
+
 User = get_user_model()
+
+
+logger = logging.getLogger(__name__)
 
 class HomeView(TemplateView):
     template_name = 'home.html'
 
 class SignInView(TemplateView):
-    template_name = 'signin.html'
+    template_name = 'login.html'
 
 class LogoutView(LogoutView):
     next_page = reverse_lazy('home')
@@ -34,65 +29,63 @@ class LogoutView(LogoutView):
         messages.success(request, "You have been successfully logged out.")
         return super().dispatch(request, *args, **kwargs)
     
-@method_decorator(csrf_exempt, name='dispatch')
-class AuthGoogleView(View):
-    """
-    Google calls this URL after the user has signed in with their Google account.
-    """
-    
-    def post(self, request, *args, **kwargs):
-        try:
-            user_data = self.get_google_user_data(request)
-            email_verified = user_data.get('email_verified', False)
-
-            if not email_verified:
-                messages.warning(request, 'Sign in Failed. Email is not verified')
-                return redirect('sign_in')
-
-        except ValueError as e:
-            print(f"Token verification failed: {e}")
-            messages.error(request, "Sign in failed")
-            return redirect('home')
-
-        email = user_data.get('email')
-        first_name = user_data.get('given_name', user_data.get('name', ''))
-        last_name = user_data.get('family_name', first_name)
-        email_verified = user_data.get('email_verified', False)
-        profile_image_url = user_data.get('picture')
-
-     
-
-        user, created = User.objects.get_or_create(
-            email=email, defaults={
-                "signup_method": "GOOGLE",
-                "first_name": first_name,
-                "last_name": last_name,
-                "is_verified": email_verified
-            }
+def google_login(request):
+    try:
+        google_auth_url = (
+            "https://accounts.google.com/o/oauth2/v2/auth"
+            "?response_type=code"
+            f"&client_id={settings.GOOGLE_CLIENT_ID}"
+            f"&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
+            "&scope=openid email profile"
         )
+        logger.info("Initiating Google login flow")
+        return redirect(google_auth_url)
+    except Exception as e:
+        logger.error("Failed to initiate Google login", exc_info=True)
+        messages.warning(request, "Unable to initiate Google login.")
+        return redirect("home")
 
-        if created and profile_image_url:
-            self.download_and_save_profile_image(user, profile_image_url)
+def google_callback(request):
+    try:
+        code = request.GET.get("code") 
+        if not code:
+            logger.warning("Google callback received without an authorization code")
+            messages.warning(request, "Authentication failed")
+            return redirect("home")
 
-        login(request, user)
-        return redirect('dashboard')
+        token_response = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": code,
+                "client_id": settings.GOOGLE_CLIENT_ID,
+                "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+                "grant_type": "authorization_code",
+            },
+        )
+        token_data = token_response.json()
+        id_token = token_data.get("id_token")
 
-    @staticmethod
-    def get_google_user_data(request: HttpRequest):
-        try:
-            token = request.POST['credential']
-            return id_token.verify_oauth2_token(
-                token, google_requests.Request(), settings.GOOGLE_OAUTH_CLIENT_ID, 
-                clock_skew_in_seconds=40
-            )
-        except Exception as e:
-            raise ValueError("Google token verification failed", e) from e
-        
-    def download_and_save_profile_image(self, user, profile_image_url):
-        try:
-            response = requests.get(profile_image_url)
-            if response.status_code == 200:
-                image_name = f'{user.pk}_profile.jpg'
-                user.profile_image.save(image_name, ContentFile(response.content), save=True)
-        except Exception as e:
-            print(f"Error downloading profile image: {e}")
+        if not id_token:
+            logger.error("Google callback missing ID token in response")
+            messages.warning(request, "Authentication failed")
+            return redirect("home")
+
+        user = authenticate(request, token=id_token)
+        if user:
+            login(request, user)
+            logger.info(f"User {user.email} authenticated via Google successfully")
+            return redirect("dashboard")
+        else:
+            logger.warning("Authentication failed for user with provided ID token")
+            messages.warning(request, "Authentication failed")
+            return redirect("home")
+
+    except requests.RequestException as e:
+        logger.error("Error during token exchange with Google", exc_info=True)
+        messages.error(request, "Google authentication service is unavailable.")
+        return redirect("home")
+    except Exception as e:
+        logger.error("Unexpected error in Google callback", exc_info=True)
+        messages.error(request, "An unexpected error occurred.")
+        return redirect("home")

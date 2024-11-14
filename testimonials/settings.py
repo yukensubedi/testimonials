@@ -42,11 +42,12 @@ INSTALLED_APPS = [
 
 
     "django_bootstrap5",
-
+     'django_filters',
     
     'user',
     'app',
-    'django_filters',
+    'subscriptions',
+   
 ]
 
 MIDDLEWARE = [
@@ -57,6 +58,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'subscriptions.middleware.SubscriptionMiddleware'
+]
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'user.backends.GoogleAuthBackend',
 ]
 
 ROOT_URLCONF = 'testimonials.urls'
@@ -157,8 +166,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 
 
-# Google OAuth
-GOOGLE_OAUTH_CLIENT_ID = config('GOOGLE_OAUTH_CLIENT_ID')
+
 
 # We need these lines below to allow the Google sign in popup to work.
 SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
@@ -226,3 +234,8 @@ LOGGING = {
         },
     },
 }
+
+
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = config('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = config('GOOGLE_REDIRECT_URI')

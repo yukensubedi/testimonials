@@ -1,17 +1,76 @@
-{% extends 'base.html' %}
+{% extends 'basefull.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Sign In{% endblock %}
 
-{% block pagetitle %}Ukn{% endblock %}
 
-{% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="#">Home</a></li>
-    <li class="breadcrumb-item active">Ukn</li>
-{% endblock %}
+
+
 
 {% block content %}
-    <!-- Your dashboard content goes here -->
-    <div class="col-lg-8">
-        <h2>Welcome to the Dashboard</h2>
+<div class="sign-in-container">
+    <div class="card">
+        <h5 class="card-title">Sign in or Sign up</h5>
+        <p class="card-text">Access your account or create a new one with Google</p>
+        <a href="{% url 'google_login' %}">
+        <button class="btn btn-outline-primary sign-in-button">
+            <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google Logo">
+            Sign in with Google
+        </button>
+    </a>
     </div>
+</div>
+
+<style>
+    .sign-in-container {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f3f4f6;
+    }
+    .card {
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        padding: 30px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #343a40;
+    }
+    .card-text {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    .sign-in-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 25px ;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #0d6efd;
+        border-color: #0d6efd;
+        border-radius: 8px;
+        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        max-width: fit-content;
+    }
+    .sign-in-button:hover {
+        background-color: #0d6efd !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .sign-in-button img {
+        width: 24px;
+        height: 24px;
+    }
+</style>
 {% endblock %}

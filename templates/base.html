@@ -152,7 +152,7 @@
               {% else %}
                   alert-primary 
               {% endif %}
-  alert-dismissible fade show" role="alert" 
+  alert-dismissible fade show" id="message-container" role="alert" 
   style="position: fixed; top: 20px; right: 20px; width: 400px; z-index: 9999;">
   
     {{ message }}
@@ -198,7 +198,7 @@
 
     <script>
         window.setTimeout(function() {
-          let alerts = document.querySelectorAll('.alert');
+          let alerts = document.querySelectorAll('#message-container');
           alerts.forEach(alert => {
             let bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();

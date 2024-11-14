@@ -15,6 +15,8 @@ class SpacesForm(forms.ModelForm):
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter your message', 'rows': 4}),
             'spaces_logo': forms.FileInput(attrs={'class': 'form-control'}),
              'star_rating': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+
+
         }
     def clean(self):
         cleaned_data = super().clean()
@@ -25,10 +27,9 @@ class SpacesForm(forms.ModelForm):
             
             max_size = 5 * 1024 * 1024  # 5 MB in bytes
             if spaces_logo.size > max_size:
-                raise forms.ValidationError("The image file size should not exceed 5 MB.")
-        
+                raise forms.ValidationError("The image file size should not exceed 5 MB.")        
         return cleaned_data
-
+        
 
 class QuestionForm(forms.ModelForm):
     class Meta:

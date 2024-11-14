@@ -2,7 +2,6 @@ Hello {{ user_name }},
 
 Welcome to Our Platform!
 
-{{ welcome_message }}
 
 We’re excited to have you on board. Feel free to explore and let us know if you have any questions.
 

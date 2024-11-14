@@ -12,7 +12,10 @@
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
-    }
+        position: sticky; /* Make it sticky */
+        top: 0; /* Stick to the top of the screen */
+        z-index: 100; 
+        }
     .preview-card:hover {
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
@@ -104,7 +107,30 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+
+
+
+<div class="modal fade" id="upgradeModal" tabindex="-1" aria-labelledby="upgradeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Upgrade Your plan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>You have reached the maximum number of spaces allowed by your current plan. Please upgrade to add more spaces.</p>
+        
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Upgrade Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="container mt-5" id="main-container">
     <div class="row g-4">
         <!-- Left Column: Live Preview -->
         <div class="col-lg-4">
@@ -140,6 +166,7 @@
             <div class="form-section">
                 <h2 class="h3 mb-4 text-center">Create a New Space</h2>
                 <p class="text-muted text-center mb-5">After the Space is created, it will generate a dedicated page for collecting testimonials.</p>
+
                 
                 <form method="post" enctype="multipart/form-data" id="create-space-form" novalidate>
                     {% csrf_token %}
@@ -253,9 +280,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const formsContainer = document.getElementById('forms-container');
     const addQuestionBtn = document.getElementById('add-question');
     const questionLimitMessage = document.getElementById('question-limit-message');
-    const maxQuestions = {{ max_questions }};
     let formIndex = formsContainer.children.length;
+    const maxQuestions = {{ max_questions }};
 
+    const userSpacesCount = {{ user_spaces_count }};
+    const maxSpaces = {{ max_spaces }};
+    console.log(userSpacesCount, maxSpaces);
+    const mainContainer = document.getElementById('main-container');
+    const upgradeModal = new bootstrap.Modal(document.getElementById('upgradeModal'));
+
+    if (userSpacesCount >= maxSpaces) {
+        // Show the modal
+        upgradeModal.show();
+
+        // Disable all form fields and hide submit button
+        Array.from(form.elements).forEach(element => {
+            element.disabled = true;
+        });
+
+        // Optionally add a notice in the main container
+        mainContainer.insertAdjacentHTML('beforebegin', `
+             
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading">Please upgrade your Plan</h4>
+                <p> You used up all quota in your current plan. Please upgrade your Plan to unlock more cool features and add more spaces!</p>
+                <hr>
+                <p class="mb-0">Explore Plans</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+        `);
+    }
     function updatePreview() {
         document.getElementById('preview-header-title').textContent = document.getElementById('id_header_title').value || 'Header goes here...';
         document.getElementById('preview-message').textContent = document.getElementById('id_message').value || 'Your custom message goes here...';
@@ -276,6 +330,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+
+   
 
     function addQuestion() {
         if (formIndex < maxQuestions) {
