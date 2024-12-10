@@ -1,16 +1,16 @@
 from django.contrib import admin
-from .models import SubscriptionPlan, UserSubscription
+from .models import SubscriptionPlan, UserSubscription, Payment
 import json
 
 @admin.register(SubscriptionPlan)
 class SubscriptionPlanAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'price', 'duration_days', 'access_level')
+    list_display = ('name', 'description', 'price', 'duration_days', 'access_level', 'stripe_price_id')
     list_filter = ('access_level',)
     search_fields = ('name',)
     readonly_fields = ('created_at', 'updated_at')
     fieldsets = (
         (None, {
-            'fields': ('name', 'description', 'price', 'duration_days', 'access_level', 'feature_limits')
+            'fields': ('name', 'description', 'price', 'stripe_price_id','duration_days', 'access_level', 'feature_limits')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at')
@@ -30,17 +30,29 @@ class SubscriptionPlanAdmin(admin.ModelAdmin):
 @admin.register(UserSubscription)
 class UserSubscriptionAdmin(admin.ModelAdmin):
     list_display = ('user', 'plan', 'start_date', 'end_date', 'is_active')
-    list_filter = ('plan', 'start_date', 'end_date')
+    list_filter = ('plan', 'start_date', 'end_date', 'is_active')
     search_fields = ('user__username', 'user__email', 'plan__name')
-    readonly_fields = ('is_active',)
 
-    def is_active(self, obj):
-        return obj.is_active()
-    is_active.boolean = True
-    is_active.short_description = 'Is Active'
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'plan', 'start_date', 'end_date')
+            'fields': ('user', 'plan', 'start_date', 'end_date', 'stripe_customer_id', 'is_active')
+        }),
+    )
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'amount', 'transaction_id', 'status', 'stripe_subscription_id', 'created_at', 'updated_at')
+    list_filter = ('status', 'created_at', 'updated_at')
+    search_fields = ('user__email', 'transaction_id', 'stripe_subscription_id')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')
+
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'product_uuid', 'amount', 'transaction_id', 'status', 'stripe_subscription_id')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
         }),
     )

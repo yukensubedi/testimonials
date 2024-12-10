@@ -29,6 +29,7 @@
 
     <!-- Template Main CSS File -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
 
     {% block extra_head %}
     {% endblock %}
@@ -39,7 +40,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm py-3">
         <div class="container">
             <!-- Logo and Testimonials text -->
-            <a href="#" class="navbar-brand d-flex align-items-center">
+            <a href="{% url 'home' %}" class="navbar-brand d-flex align-items-center">
                 <img src="{% static 'img/logo.png' %}" alt="" class="me-2" style="width: 40px;">
                 <!-- Hide the text on smaller screens -->
                 <span class="fw-bold fs-4 text-primary d-none d-lg-block">Testimonials</span>
@@ -70,7 +71,7 @@
                         <a class="nav-link text-dark" href="#">Integrations</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="#">Pricing</a>
+                        <a class="nav-link text-dark" href="{% url 'pricing' %}">Pricing</a>
                     </li>
                 </ul>
     
@@ -78,7 +79,7 @@
                 <div class="d-flex ms-auto">
                     {% if user.is_authenticated %}
                      <!-- Vertically centered Modal -->
-                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+                    <button type="button" class="btn btn-primary  w-100" data-bs-toggle="modal" data-bs-target="#verticalycentered">
                        Logout
                     </button>
                     <div class="modal fade" id="verticalycentered" tabindex="-1">
@@ -136,23 +137,13 @@
                 <!-- Page content goes here -->
     {% endblock %}
     
-    <!-- <main class="container mt-5 py-5">
-        <div class="row justify-content-center text-center pt-5">
-            <div class="col-md-8">
-                <h1 class="display-4 fw-bold mb-4">Get testimonials from your customers with ease</h1>
-                <p class="lead mb-5">Collecting testimonials is hard, we get it! So we built Testimonial. In minutes, you can collect text and video testimonials from your customers with no need for a developer or website hosting.</p>
-                <div class="d-flex justify-content-center mb-3">
-                    <a href="#" class="btn btn-primary btn-lg me-3">Try FREE now</a>
-                    <a href="#" class="btn btn-outline-primary btn-lg">Talk to us 👋</a>
-                </div>
-                <p class="text-muted">Get started with free credits on us. <a href="#" class="text-primary">See our pricing →</a></p>
-            </div>
-        </div>
-    </main> -->
+   
     
     <footer class="container mt-5 fixed-bottom bg-light shadow-sm">
-        <p class="text-center text-muted">© 2023 Testimonial. All rights reserved.</p>
+        <p class="text-center text-muted small ">© 2023 Testimonial. All rights reserved.</p>
     </footer>
+
+    
     
     <script>
         window.setTimeout(function() {
@@ -178,3 +169,4 @@
 </body>
 
 </html>
+

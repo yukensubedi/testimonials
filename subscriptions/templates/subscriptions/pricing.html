@@ -1,0 +1,213 @@
+{% extends 'basefull.html' %}
+
+{% block title %}Pricing{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="container">
+        <h1>Choose Your Perfect Plan</h1>
+        <p>Unlock amazing features and boost your productivity with our flexible pricing options.</p>
+    </div>
+</section>
+
+<section id="pricing" class="pricing-cards">
+    {% for plan in plans %}
+        <div class="card {% if plan.name == 'Basic' %}popular{% endif %}">
+            <h2>{{ plan.name }}</h2>
+            <div class="price">
+               
+                    ${{ plan.price }}<span>/month</span>
+               
+            </div>
+            <ul class="features">
+                {% for feature in plan.features %}
+                <li><i class="bi bi-check2"></i> {{ feature }}</li>
+                {% endfor %}
+                <!-- {% for feature, value in plan.feature_limits.items %}
+                    <li><i class="bi bi-check2"></i> {{ feature|title }}: {{ value }}</li>
+                {% endfor %} -->
+            </ul>
+            {% if current_plan %}
+                {% if plan.access_level < current_plan.access_level %}
+                    <a href="#" class="btn-pricing disabled">Unavailable</a>
+                {% elif plan == current_plan %}
+                    <a href="{% url 'dashboard' %}" class="btn-pricing current">Get Started</a>
+                {% elif plan == 'Free' %}
+                    <a href="{% url 'dashboard' %}" class="btn-pricing">Get Started</a>
+                {% else %}
+                    <a href="{% url 'create_checkout_session' %}?plan={{ plan.name }}&return_url= {% url 'pricing' %} " class="btn-pricing">Upgrade</a>
+                {% endif %}
+            {% else %}
+                {% if plan.name == 'Free' %}
+                        <a href="{% url 'dashboard' %}" class="btn-pricing">Get Started</a> 
+                {% else %}
+                <a href="{% url 'create_checkout_session' %}?plan={{ plan.name }}&return_url= {% url 'pricing' %} " class="btn-pricing">Start Free Trial {{plan.name}}</a>
+                {% endif %}
+               
+            {% endif %}
+        </div>
+    {% endfor %}
+</section>
+
+<style>
+    :root {
+        --primary-color: #6C63FF;
+        --secondary-color: #4CAF50;
+        --background-color: #F0F4F8;
+        --text-color: #333;
+        --card-bg-color: #FFFFFF;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .hero {
+        text-align: center;
+        padding: 40px 0;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+
+    .hero p {
+        font-size: 18px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .pricing-cards {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        padding: 20px 0;
+    }
+
+    .card {
+        background-color: var(--card-bg-color);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 300px;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .price {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .price span {
+        font-size: 18px;
+        font-weight: 400;
+    }
+
+    .features {
+        list-style-type: none;
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    .features li {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .features li i {
+        color: var(--secondary-color);
+        margin-right: 10px;
+    }
+
+    .btn-pricing {
+        display: inline-block;
+        background-color: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-pricing:hover {
+        background-color: #5A52D5;
+        transform: scale(1.05);
+    }
+
+    .btn-pricing.disabled {
+        background-color: #ccc;
+        color: #999;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    .popular {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .popular::before {
+        content: "Popular";
+        position: absolute;
+        top: 20px;
+        right: -35px;
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 8px 40px;
+        transform: rotate(45deg);
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .current-plan {
+        border: 2px solid var(--secondary-color);
+        position: relative;
+    }
+
+    @media (max-width: 768px) {
+        .pricing-cards {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-15px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+
+{% endblock %}

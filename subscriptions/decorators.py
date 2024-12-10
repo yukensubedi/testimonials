@@ -12,7 +12,7 @@ def subscription_required(min_access_level, redirect_url='home'):
             
             if not hasattr(request, 'subscription') or not request.subscription:
                 messages.warning(request, 'Subscription required')
-                return redirect('home')
+                return redirect('pricing')
             
             if request.subscription.plan.access_level < min_access_level:
                 messages.warning(request, 'You are not allowed to perform this action. Please Upgrade')

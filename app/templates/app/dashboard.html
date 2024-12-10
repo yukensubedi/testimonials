@@ -26,12 +26,11 @@
             <div class="card info-card sales-card">
 
               <div class="card-body">
-                <h5 class="card-title">Spaces <span>| Total</span></h5>
+                <h5 class="card-title">Spaces <span>| {{max_spaces}}</span></h5>
 
                 <div class="d-flex align-items-center">
                   <div class="ps-3">
-                    <h6>{{ spaces_count }}</h6>
-                    <!-- <span class="text-success small pt-1 fw-bold">out of 10</span>  -->
+                    <h6>{{ spaces_count }} </h6>
                   </div>
                 </div>
               </div>
@@ -44,7 +43,7 @@
             <div class="card info-card revenue-card">
 
               <div class="card-body">
-                <h5 class="card-title">Testimonials <span>| Total</span></h5>
+                <h5 class="card-title">Testimonials <span>| {{max_testimonials}} </span></h5>
 
                 <div class="d-flex align-items-center">
                    
@@ -61,68 +60,28 @@
 
           <!-- Current Plan Card -->
           <div class="col-xxl-4 col-xl-12">
-
             <div class="card info-card customers-card">
-
-              <div class="card-body">
-                <h5 class="card-title">Current Plan  <span>| </span></h5>
-
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="ps-3">
-                        <h6>Starter</h6>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Current Plan 
+                        <span class="text-warning"></span>
+                    </h5>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="ps-3">
+                            <h6>{{ current_subscription }}</h6>
+                        </div>
+                        {% if current_subscription != 'Pro' %}
+                        <div>
+                            <a href="{% url 'pricing' %}" class="btn btn-warning text-white fw-bold">Upgrade</a>
+                        </div>
+                        {% endif %}
                     </div>
-                    <button type="button" class="btn btn-warning text-white"><i class="bi  bi-cloud-arrow-up-fill"></i> Upgrade </button>
                 </div>
-                
-              </div>
             </div>
+        </div>
+        <!-- End Customers Card -->
 
-          </div><!-- End Customers Card -->
-
-         <!-- Spaces -->
-         <!-- <div class="col-12">
-            <div class="card top-selling overflow-auto">
-
-              <div class="card-body pb-0">
-                <h5 class="card-title">Your Spaces <span>| {{ spaces_count }}</span></h5>
-
-                <table class="table table-borderless">
-                    <thead>
-                        <tr>
-                            <th scope="col">Sn</th>
-                            <th scope="col">Space Name</th>
-                            <th scope="col">Total Testimonials Received</th>
-                            <th scope="col">Created at</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for space in spaces %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th> 
-                            <td>
-                                <a href="#" class="text-primary fw-bold">{{ space.spaces_name }}</a>
-                            </td>
-                            <td>{{ space.testimonials.count }}</td>   
-                            <td>{{ space.created_at|date:"Y-m-d H:i" }}</td>  
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center">No spaces found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                
-
-              </div>
-
-            </div>
-          </div> -->
-          <!-- End Spaces -->
-          
         
-         <!-- Spaces Test -->
-
          
       
 <div class="col-12">

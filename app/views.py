@@ -1,32 +1,33 @@
-from django.db.models.query import QuerySet
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.list import ListView
-from django.views.generic.base import TemplateView
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.contrib import messages
-
-from django.urls import reverse_lazy, reverse
-from django.db.models import Avg, Count
-from django.utils import timezone
-from django.core.paginator import Paginator
-from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
-from django.core.exceptions import ValidationError
-
-from .models import Spaces, Question, Testimonials, WallofLove
-from .forms import SpacesForm, QuestionFormSet, TestimonialForm, QuestionForm
-from django_filters.views import FilterView
-from .filters import SpacesFilter
-from .tasks import send_email
 import json
 import logging
-from subscriptions.decorators import subscription_required
-from django.utils.decorators import method_decorator
-from django.db import transaction
-from django.contrib.auth.decorators import login_required
 
+from django.views import View
+from django.db import transaction
+from django.contrib import messages
+from django.urls import reverse_lazy, reverse
+from django.shortcuts import render, redirect, get_object_or_404
+from django_filters.views import FilterView
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
+from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, DeleteView
+
+from django.db.models import Avg, Count
+from django.core.paginator import Paginator
+from django.http import HttpResponseForbidden, HttpResponse
+from django.core.exceptions import ValidationError
+
+from .models import Spaces, Testimonials, WallofLove
+from .forms import SpacesForm, QuestionFormSet, TestimonialForm
+from .filters import SpacesFilter
+from .tasks import send_email
+
+from subscriptions.decorators import subscription_required
 
 logger = logging.getLogger(__name__)
 @subscription_required(min_access_level=1)
@@ -55,6 +56,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Retrieve recent testimonials, limited to 5 most recent
             context['recent_testimonials'] = Testimonials.objects.filter(spaces__user=user).order_by('-created_at')[:5]
             context['testimonial_count'] = Testimonials.objects.filter(spaces__user=user).count()
+            max_spaces = self.request.subscription.plan.get_limit('max_spaces')
+            context['max_spaces']= max_spaces
+
+            max_testimonials = self.request.subscription.plan.get_limit('testimonials_count')
+            context['max_testimonials'] = max_testimonials * max_spaces
+            context['current_subscription']= self.request.subscription.plan.name
+
 
             # Generate links for each space
             for space in spaces:
@@ -64,7 +72,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 except Exception as e:
                     logger.error(f"Error generating link for space ID {space.id}: {e}")
             
-            logger.info(f"Dashboard loaded for user {user} with {context['spaces_count']} spaces and {context['testimonial_count']} testimonials.")
 
         except Exception as e:
             logger.error(f"Error loading dashboard for user {user}: {e}")
@@ -365,15 +372,13 @@ class SpacesDeleteView(LoginRequiredMixin, DeleteView):
         return super().dispatch(request, *args, **kwargs)
     
 
-@subscription_required(min_access_level=1)
 def wall_of_love_json(request, slug):
     """
     View to display the embedding content from wall of love.  
     """
     space = get_object_or_404(Spaces, slug=slug)
-    subscription_plan_name =  request.subscription.plan.name
 
-    
+
     # Get all testimonials in WallOfLove for this space
     wall_of_love_testimonials = WallofLove.objects.filter(testimonial__spaces=space).values(
         'testimonial__testimonial_text',
@@ -384,7 +389,7 @@ def wall_of_love_json(request, slug):
     ).order_by('-testimonial__created_at')
     testimonials_json = json.dumps(list(wall_of_love_testimonials), default=str)
     # Prepare the data for JSON response
-    response = render(request, 'app/embed_wall_of_love.html', {'testimonials_json': testimonials_json, 'subscription':subscription_plan_name})
+    response = render(request, 'app/embed_wall_of_love.html', {'testimonials_json': testimonials_json})
     response['X-Frame-Options'] = 'ALLOWALL'  
     return response
 
